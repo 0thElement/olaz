@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/popup_item.dart';
 import 'package:olaz/widgets/post_item.dart';
-
-class Post {}
 
 class SocialWallScreen extends StatefulWidget {
   const SocialWallScreen({Key? key}) : super(key: key);
@@ -12,8 +11,6 @@ class SocialWallScreen extends StatefulWidget {
 }
 
 class _SocialWallScreenState extends State<SocialWallScreen> {
-  List<Post>? posts;
-
   List<PopupMenuItem> addPopupMenuButtonItems() {
     return [
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
@@ -47,17 +44,24 @@ class _SocialWallScreenState extends State<SocialWallScreen> {
                 })
           ],
         ),
-        body: (ListView.builder(
-            itemCount: 1,
-            shrinkWrap: true,
-            itemBuilder: ((context, index) {
-              return PostItem(
-                  "Username",
-                  "",
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                  DateTime.utc(2022, 4, 11, 16, 20),
-                  DateTime.utc(2022, 4, 12, 3, 30),
-                  5);
-            }))));
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                  itemCount: 1,
+                  shrinkWrap: true,
+                  itemBuilder: ((context, index) {
+                    return PostItem(
+                        "Username",
+                        "",
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                        DateTime.utc(2022, 4, 11, 16, 20),
+                        DateTime.utc(2022, 4, 12, 3, 30),
+                        5);
+                  })),
+            ),
+            MessageBar("Share your thought...", () {})
+          ],
+        ));
   }
 }
