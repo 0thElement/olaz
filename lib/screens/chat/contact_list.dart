@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:olaz/widgets/contact_item.dart';
+import 'package:olaz/widgets/popup_item.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({Key? key}) : super(key: key);
@@ -14,26 +15,6 @@ class _ContactScreenState extends State<ContactScreen> {
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
       createPopupItem('Create a group', 'group', Icons.group_add),
     ];
-  }
-
-  PopupMenuItem createPopupItem(String text, String value, IconData icon) {
-    return PopupMenuItem(
-        child: Text.rich(
-          TextSpan(children: [
-            WidgetSpan(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    icon,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                alignment: PlaceholderAlignment.middle),
-            TextSpan(text: text)
-          ]),
-          style: TextStyle(color: Colors.grey[700]),
-        ),
-        value: value);
   }
 
   @override
@@ -53,7 +34,10 @@ class _ContactScreenState extends State<ContactScreen> {
           ),
           actions: [
             PopupMenuButton(
-                icon: const Icon(Icons.add),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.white70,
+                ),
                 itemBuilder: (context) {
                   return addPopupMenuButtonItems();
                 })
