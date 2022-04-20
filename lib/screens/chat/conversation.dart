@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:olaz/widgets/message.dart';
+import 'package:olaz/widgets/message_bar.dart';
+import 'package:olaz/widgets/message_bubble.dart';
 
 class ConversationScreen extends StatefulWidget {
   const ConversationScreen({Key? key}) : super(key: key);
@@ -11,20 +12,22 @@ class ConversationScreen extends StatefulWidget {
 class MessageData {
   bool wasSentBySelf;
   String message;
-  MessageData(this.message, this.wasSentBySelf);
+  String user;
+  MessageData(this.user, this.message, this.wasSentBySelf);
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
   List<MessageData> messages = [
-    MessageData("Message 1", true),
+    MessageData("user1", "Message 1", true),
     MessageData(
+        "user2",
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
         false),
-    MessageData("Message 3", true),
-    MessageData("Messagealdkfj 3", true),
-    MessageData("Message 4", false),
-    MessageData("Messageadlfkj 5", false),
-    MessageData("Message 6", false),
+    MessageData("user1", "Message 3", true),
+    MessageData("user1", "Messagealdkfj 3", true),
+    MessageData("user2", "Message 4", false),
+    MessageData("user2", "Messageadlfkj 5", false),
+    MessageData("user2", "Message 6", false),
   ];
 
   @override
@@ -44,40 +47,21 @@ class _ConversationScreenState extends State<ConversationScreen> {
       shrinkWrap: true,
       itemBuilder: (context, index) {
         bool isBottomOfChain = index == messages.length - 1 ||
-            messages[index + 1].wasSentBySelf != messages[index].wasSentBySelf;
-        bool isTopOfChain = index == 0 ||
-            messages[index - 1].wasSentBySelf != messages[index].wasSentBySelf;
+            messages[index + 1].user != messages[index].user;
+        bool isTopOfChain =
+            index == 0 || messages[index - 1].user != messages[index].user;
 
-        return Message(messages[index].message, messages[index].wasSentBySelf,
-            isTopOfChain, isBottomOfChain);
+        return MessageBubble(
+          messages[index].message,
+          messages[index].wasSentBySelf,
+          isTopOfChain,
+          isBottomOfChain,
+          user: "Username",
+          avatar: "",
+        );
       });
 
-  Widget sendMessageBar() => Align(
-        alignment: Alignment.bottomLeft,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: 50),
-          child: Row(children: [
-            //More options button
-            IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
-            //Text field
-            const Expanded(
-              child: TextField(
-                keyboardType: TextInputType.multiline,
-                textAlignVertical: TextAlignVertical.center,
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(15),
-                    hintText: "Write message...",
-                    border: InputBorder.none),
-                maxLines: null,
-              ),
-            ),
-            //Send Button
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.send, color: Colors.lightBlue))
-          ]),
-        ),
-      );
+  Widget sendMessageBar() => MessageBar("Write message...", () {});
 
   AppBar customAppBar(BuildContext context) => AppBar(
         elevation: 0,
