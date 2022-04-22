@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olaz/screens/chat/contact_list.dart';
 import 'package:olaz/screens/social/wall.dart';
-import 'package:olaz/screens/profile/profile.dart';
+import 'package:olaz/screens/profile/edit_profile.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = [
     ContactScreen(),
     SocialWallScreen(),
-    ProfileScreen()
+    EditProfileScreen()
   ];
 
   void onItemSelected(index) {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-Text iconText(
-        String text, IconData icon, TextStyle textStyle, Color iconColor) =>
+Text iconText(String text, IconData icon, TextStyle textStyle, Color iconColor,
+        {TextAlign align = TextAlign.left}) =>
     Text.rich(
       TextSpan(children: [
         WidgetSpan(
@@ -15,5 +15,6 @@ Text iconText(
             alignment: PlaceholderAlignment.middle),
         TextSpan(text: text)
       ]),
+      textAlign: align,
       style: textStyle,
     );
