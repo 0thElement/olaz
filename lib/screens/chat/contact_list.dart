@@ -66,7 +66,7 @@ class _ContactScreenState extends State<ContactScreen> {
               return ContactItem(
                   "name",
                   "hi",
-                  "https://cdn.discordapp.com/avatars/941261266670985248/58ae7c0c0ee9363f4f8607a4060c281c.png?size=256",
+                  "https://thumbs.dreamstime.com/b/woman-praying-free-birds-to-nature-sunset-background-woman-praying-free-birds-enjoying-nature-sunset-99680945.jpg",
                   "1h",
                   index);
             }))));

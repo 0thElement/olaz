@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "419404396644",
+    "project_id": "olaz-aebc9",
+    "storage_bucket": "olaz-aebc9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:419404396644:android:d39eb321d09064aa838771",
+        "android_client_info": {
+          "package_name": "com.example.olaz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "419404396644-hs1f3g759oqm6g5td2itjvjbmm91jm62.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8XZqwwnsPT7FWsi9L4iudR1t_rN2LMoY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "419404396644-hs1f3g759oqm6g5td2itjvjbmm91jm62.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "419404396644-pavtgqkngffph9aacaa9tg5561acrt0k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.olaz"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

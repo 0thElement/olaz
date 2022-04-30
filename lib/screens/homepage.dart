@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:olaz/screens/chat/contact_list.dart';
+import 'package:olaz/screens/login/login.dart';
 import 'package:olaz/screens/social/wall.dart';
 import 'package:olaz/screens/profile/profile.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
@@ -16,7 +17,8 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = [
     ContactScreen(),
     SocialWallScreen(),
-    ProfileScreen()
+    ProfileScreen(),
+    LoginPage(),
   ];
 
   void onItemSelected(index) {
@@ -55,7 +57,12 @@ class _HomePageState extends State<HomePage> {
                 'Profile',
                 _screenIndex == 2
                     ? Icons.account_circle
-                    : Icons.account_circle_outlined)
+                    : Icons.account_circle_outlined),
+            createItem(
+                'Login',
+                _screenIndex == 3
+                    ? Icons.add_circle
+                    : Icons.add_circle_outlined),
           ]),
     );
   }
