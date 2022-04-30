@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/screens/login/login_controller.dart';
@@ -29,6 +28,14 @@ class LoginPage extends GetView<LoginController> {
               RaisedButton(
                 child: Text('Login'),
                 onPressed: controller.login,
+              ),
+              RaisedButton(
+                child: Text('Sign in with Google'),
+                onPressed: controller.signInWithGoogle,
+              ),
+              RaisedButton(
+                child: Text('Sign in with Facebook'),
+                onPressed: controller.signInWithFacebook,
               )
             ],
           ),

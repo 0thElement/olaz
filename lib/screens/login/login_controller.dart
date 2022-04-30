@@ -51,11 +51,17 @@ class LoginController extends GetxController {
   // Api Simulation
   Future<bool> checkUser(String user, String password) {
     logger.info("checkUser");
-    AuthService().register(user, password);
+    AuthService().signInWithGoogle();
+    return Future.value(true);
+  }
 
-    if (user == 'foo@foo.com' && password == '123') {
-      return Future.value(true);
-    }
-    return Future.value(false);
+  Future signInWithGoogle() async {
+    AuthService().signInWithGoogle();
+    return Future.value(true);
+  }
+
+  Future signInWithFacebook() async {
+    AuthService().signInWithFacebook();
+    return Future.value(true);
   }
 }
