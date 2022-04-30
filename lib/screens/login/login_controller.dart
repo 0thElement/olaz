@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logging/logging.dart';
+import 'package:olaz/services/auth.dart';
 
 class LoginController extends GetxController {
+  final logger = Logger("LoginController");
   final loginFormKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -9,7 +12,6 @@ class LoginController extends GetxController {
   @override
   void onInit() {
     // Simulating obtaining the user name from some local storage
-    emailController.text = 'foo@foo.com';
     super.onInit();
   }
 
@@ -48,6 +50,9 @@ class LoginController extends GetxController {
 
   // Api Simulation
   Future<bool> checkUser(String user, String password) {
+    logger.info("checkUser");
+    AuthService().register(user, password);
+
     if (user == 'foo@foo.com' && password == '123') {
       return Future.value(true);
     }

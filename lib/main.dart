@@ -20,6 +20,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialRoute: "/login",
+      debugShowCheckedModeBanner: false,
+      debugShowMaterialGrid: false,
+      showSemanticsDebugger: false,
       getPages: [
         GetPage(name: "/login", page: () => LoginPage(), binding: LoginBinding()),
         GetPage(name: "/home", page: () => HomePage()),
