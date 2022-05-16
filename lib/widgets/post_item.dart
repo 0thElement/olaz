@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:olaz/screens/social/comments.dart';
 import 'package:olaz/widgets/icon_text.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
-//TODO: use timeago
 class PostItem extends StatefulWidget {
   final String user;
   final String userAvatar;
@@ -21,7 +21,7 @@ class PostItem extends StatefulWidget {
 }
 
 class _PostItemState extends State<PostItem> {
-  static const MAX_LINES = 5;
+  static const maxLines = 5;
   bool showAllContent = false;
   bool exceeded = false;
 
@@ -47,7 +47,7 @@ class _PostItemState extends State<PostItem> {
             height: 6,
           ),
           Text(
-            DateTime.now().difference(widget.created).inDays.toString() + "d",
+            timeago.format(widget.created, locale: "en_short"),
             style: TextStyle(
                 fontSize: 13,
                 color: Colors.grey.shade600,
@@ -58,7 +58,7 @@ class _PostItemState extends State<PostItem> {
 
   Widget content() => LayoutBuilder(builder: (context, size) {
         TextPainter tp = TextPainter(
-            maxLines: MAX_LINES,
+            maxLines: maxLines,
             textAlign: TextAlign.left,
             textDirection: TextDirection.ltr,
             text: TextSpan(text: widget.content));
@@ -68,7 +68,7 @@ class _PostItemState extends State<PostItem> {
 
         Widget content = (exceeded && !showAllContent)
             ? ShaderMask(
-                child: Text(widget.content, maxLines: MAX_LINES),
+                child: Text(widget.content, maxLines: maxLines),
                 shaderCallback: (bounds) => const LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

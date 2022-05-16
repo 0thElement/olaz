@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/user.dart';
-import 'package:olaz/screens/chat/chat_controller.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 
 class MessageBubble extends StatelessWidget {
-  final Future<User>? user;
+  final String? userId;
   final bool wasSentBySelf;
   final String message;
   final bool isTopOfChain;
   final bool isBottomOfChain;
-  const MessageBubble(
-      this.message, this.wasSentBySelf, this.isTopOfChain, this.isBottomOfChain,
-      {this.user, Key? key})
+  final String time;
+  const MessageBubble(this.message, this.wasSentBySelf, this.isTopOfChain,
+      this.isBottomOfChain, this.time,
+      {this.userId, Key? key})
       : super(key: key);
 
   static const Radius borderRadius = Radius.circular(20);
 
-  bool shouldRenderSender() => !wasSentBySelf && user != null && isTopOfChain;
+  bool shouldRenderSender() => !wasSentBySelf && userId != null && isTopOfChain;
 
   Widget userAvatar(String avatar) => CircleAvatar(
         backgroundImage: NetworkImage(avatar),
@@ -24,7 +25,7 @@ class MessageBubble extends StatelessWidget {
       );
 
   Widget username(String name) => Text(
-        name,
+        "$name - $time",
         style: TextStyle(fontSize: 12, color: Colors.grey[700]),
       );
 
@@ -65,32 +66,34 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<User>(
-      initialData: User.emptyUser,
-      future: user,
-      builder: (context, snapshot) => Container(
-          padding: EdgeInsets.only(
-            left: 0,
-            right: 14,
-            top: isTopOfChain ? 10 : 2,
-            bottom: isBottomOfChain ? 10 : 2,
-          ),
-          child: Stack(
-            children: shouldRenderSender()
-                ? [
-                    bubble(),
-                    Positioned(
-                        child: userAvatar(snapshot.data?.profilePicture ?? ""),
-                        left: 7,
-                        top: -20),
-                    Positioned(
-                        child: username(snapshot.data?.name ?? ""),
-                        left: 54,
-                        top: -20),
-                  ]
-                : [bubble()],
-            clipBehavior: Clip.none,
-          )),
-    );
+    return Container(
+        padding: EdgeInsets.only(
+          left: 0,
+          right: 14,
+          top: isTopOfChain ? 10 : 2,
+          bottom: isBottomOfChain ? 10 : 2,
+        ),
+        child: shouldRenderSender()
+            ? FutureBuilder<User>(
+                initialData: User.emptyUser,
+                future: Get.find<ChatController>().getUser(userId!),
+                builder: (context, snapshot) => Stack(
+                      children: shouldRenderSender()
+                          ? [
+                              bubble(),
+                              Positioned(
+                                  child: userAvatar(
+                                      snapshot.data?.profilePicture ?? ""),
+                                  left: 7,
+                                  top: -20),
+                              Positioned(
+                                  child: username(snapshot.data?.name ?? ""),
+                                  left: 54,
+                                  top: -20),
+                            ]
+                          : [bubble()],
+                      clipBehavior: Clip.none,
+                    ))
+            : bubble());
   }
 }

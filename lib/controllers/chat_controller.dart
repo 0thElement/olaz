@@ -88,5 +88,5 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
     _sending(false);
   }
 
-  Future<User> getUser(Message message) => userCrud.get(message.sender);
+  Future<User> getUser(String userId) => userCrud.get(userId);
 }

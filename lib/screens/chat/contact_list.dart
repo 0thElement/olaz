@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
-import 'package:olaz/screens/chat/chat_controller.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/contact_item.dart';
 import 'package:olaz/widgets/popup_item.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ContactScreen extends GetView<ChatController> {
   const ContactScreen({Key? key}) : super(key: key);
@@ -41,17 +43,22 @@ class ContactScreen extends GetView<ChatController> {
                 })
           ],
         ),
-        body: controller.obx((state) => ListView.builder(
-            itemCount: state?.length ?? 0,
-            shrinkWrap: true,
-            itemBuilder: ((context, index) {
-              Room room = state![index];
-              return ContactItem(
-                  room,
-                  controller.messages[room.id]?.last.payload ?? "",
-                  "https://cdn.discordapp.com/avatars/941261266670985248/58ae7c0c0ee9363f4f8607a4060c281c.png?size=256",
-                  "1h",
-                  0);
-            }))));
+        body: controller.obx(
+          (state) => ListView.builder(
+              itemCount: state?.length ?? 0,
+              shrinkWrap: true,
+              itemBuilder: ((context, index) {
+                Room room = state![index];
+                Message latestMessage = controller.messages[room.id]!.last;
+                DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
+                    latestMessage.createdAt.millisecondsSinceEpoch);
+                String time = timeago.format(durationAgo, locale: 'en_short');
+                return ContactItem(room, latestMessage.payload, time, 0);
+              })),
+          onEmpty: const Center(
+            child: Text("No contacts found. Press + to add a contact."),
+          ),
+          onLoading: const Center(child: CircularProgressIndicator()),
+        ));
   }
 }

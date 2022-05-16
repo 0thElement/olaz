@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
-import 'package:olaz/screens/chat/chat_controller.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/message_bubble.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ConversationScreen extends StatelessWidget {
   ConversationScreen(this.room, {Key? key}) : super(key: key);
@@ -46,9 +47,17 @@ class ConversationScreen extends StatelessWidget {
               bool isTopOfChain = index == 0 ||
                   messages[index - 1].sender != messages[index].sender;
 
-              return MessageBubble(messages[index].payload,
-                  messages[index].wasSentBySelf, isTopOfChain, isBottomOfChain,
-                  user: controller.getUser(messages[index]));
+              DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
+                  messages[index].createdAt.millisecondsSinceEpoch);
+              String time = timeago.format(durationAgo, locale: 'en_short');
+
+              return MessageBubble(
+                  messages[index].payload,
+                  messages[index].wasSentBySelf,
+                  isTopOfChain,
+                  isBottomOfChain,
+                  time,
+                  userId: messages[index].sender);
             });
       });
 

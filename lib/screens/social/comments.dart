@@ -21,13 +21,13 @@ class CommentScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: 5,
-              itemBuilder: (context, index) => MessageBubble(
-                  "comment", index % 2 == 0, true, true,
-                  user: null),
-            ),
-          ),
+              child: ListView.builder(
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    return MessageBubble(
+                        "comment", index % 2 == 0, true, true, "",
+                        userId: null);
+                  })),
           MessageBar("Write a comment...", messageTec, () {})
         ],
       ),

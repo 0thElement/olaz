@@ -14,9 +14,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _screenIndex = 0;
   final List<Widget> _screens = [
-    ContactScreen(),
+    const ContactScreen(),
     SocialWallScreen(),
-    EditProfileScreen()
+    const EditProfileScreen()
   ];
 
   void onItemSelected(index) {
