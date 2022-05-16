@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "137975535295",
+    "project_id": "olaz-test",
+    "storage_bucket": "olaz-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137975535295:android:b8af56f149d676bca6d80a",
+        "android_client_info": {
+          "package_name": "com.example.olaz"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "137975535295-mke5t0dsvnt4f09gm84e9lci6ds50qpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBc35pRe8XCynBArPZDG2ucvy5qRDaYmec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "137975535295-mke5t0dsvnt4f09gm84e9lci6ds50qpr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
