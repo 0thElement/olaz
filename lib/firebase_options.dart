@@ -37,29 +37,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAH4ogvnQ4INNTw_tlicYUotmY_wlCpFzU',
-    appId: '1:137975535295:web:4dbc5b95d68785fda6d80a',
-    messagingSenderId: '137975535295',
-    projectId: 'olaz-test',
-    authDomain: 'olaz-test.firebaseapp.com',
-    storageBucket: 'olaz-test.appspot.com',
+    apiKey: 'AIzaSyCl_LCjcDrx1d-u3sbFo7pPZ7VsJJaALtI',
+    appId: '1:419404396644:web:d5fbfe4c1f8bd880838771',
+    messagingSenderId: '419404396644',
+    projectId: 'olaz-aebc9',
+    authDomain: 'olaz-aebc9.firebaseapp.com',
+    storageBucket: 'olaz-aebc9.appspot.com',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBc35pRe8XCynBArPZDG2ucvy5qRDaYmec',
-    appId: '1:137975535295:android:b8af56f149d676bca6d80a',
-    messagingSenderId: '137975535295',
-    projectId: 'olaz-test',
-    storageBucket: 'olaz-test.appspot.com',
+    apiKey: 'AIzaSyA8XZqwwnsPT7FWsi9L4iudR1t_rN2LMoY',
+    appId: '1:419404396644:android:d39eb321d09064aa838771',
+    messagingSenderId: '419404396644',
+    projectId: 'olaz-aebc9',
+    storageBucket: 'olaz-aebc9.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAo1lOZH6WQrygWzcLIpMIF-HTOYvzPEgY',
-    appId: '1:137975535295:ios:2b91f536da380d6ba6d80a',
-    messagingSenderId: '137975535295',
-    projectId: 'olaz-test',
-    storageBucket: 'olaz-test.appspot.com',
-    iosClientId: '137975535295-p14ela4scf8om2b67s9hsjvkkhd8o3fr.apps.googleusercontent.com',
+    apiKey: 'AIzaSyDAo55lVuSh7m82MaWmLPjfy0ILnpHDleQ',
+    appId: '1:419404396644:ios:1c799c0243667113838771',
+    messagingSenderId: '419404396644',
+    projectId: 'olaz-aebc9',
+    storageBucket: 'olaz-aebc9.appspot.com',
+    iosClientId:
+        '419404396644-pavtgqkngffph9aacaa9tg5561acrt0k.apps.googleusercontent.com',
     iosBundleId: 'com.example.olaz',
   );
 }

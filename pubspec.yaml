@@ -39,6 +39,11 @@ dependencies:
   cloud_firestore: ^3.1.14
   equatable: ^2.0.3
   timeago: ^3.2.2
+  firebase_core: ^1.15.0
+  firebase_auth: ^3.3.16
+  google_sign_in: '^4.5.1'
+  logging: ^1.0.2
+  flutter_facebook_auth: '^3.5.0'
 
 dev_dependencies:
   flutter_test:

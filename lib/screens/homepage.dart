@@ -1,8 +1,10 @@
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:olaz/screens/chat/contact_list.dart';
 import 'package:olaz/screens/social/wall.dart';
 import 'package:olaz/screens/profile/edit_profile.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:olaz/screens/login/login.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,7 +18,8 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _screens = [
     const ContactScreen(),
     SocialWallScreen(),
-    const EditProfileScreen()
+    const EditProfileScreen(),
+    const LoginPage(),
   ];
 
   void onItemSelected(index) {
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(FirebaseAuth.instance.currentUser);
     return Scaffold(
       body: _screens[_screenIndex],
       bottomNavigationBar: BottomNavyBar(
@@ -55,7 +59,12 @@ class _HomePageState extends State<HomePage> {
                 'Profile',
                 _screenIndex == 2
                     ? Icons.account_circle
-                    : Icons.account_circle_outlined)
+                    : Icons.account_circle_outlined),
+            createItem(
+                'Login',
+                _screenIndex == 3
+                    ? Icons.add_circle
+                    : Icons.add_circle_outlined),
           ]),
     );
   }
