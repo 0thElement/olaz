@@ -3,14 +3,11 @@ import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/popup_item.dart';
 import 'package:olaz/widgets/post_item.dart';
 
-class SocialWallScreen extends StatefulWidget {
-  const SocialWallScreen({Key? key}) : super(key: key);
+class SocialWallScreen extends StatelessWidget {
+  SocialWallScreen({Key? key}) : super(key: key);
 
-  @override
-  State<SocialWallScreen> createState() => _SocialWallScreenState();
-}
+  final TextEditingController messageTec = TextEditingController();
 
-class _SocialWallScreenState extends State<SocialWallScreen> {
   List<PopupMenuItem> addPopupMenuButtonItems() {
     return [
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
@@ -60,7 +57,7 @@ class _SocialWallScreenState extends State<SocialWallScreen> {
                         5);
                   })),
             ),
-            MessageBar("Share your thought...", () {})
+            MessageBar("Share your thought...", messageTec, () {})
           ],
         ));
   }

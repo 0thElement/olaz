@@ -1,34 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/message.dart';
+import 'package:olaz/models/room.dart';
+import 'package:olaz/screens/chat/chat_controller.dart';
 import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/message_bubble.dart';
 
-class ConversationScreen extends StatefulWidget {
-  const ConversationScreen({Key? key}) : super(key: key);
+class ConversationScreen extends StatelessWidget {
+  ConversationScreen(this.room, {Key? key}) : super(key: key);
 
-  @override
-  State<ConversationScreen> createState() => _ConversationScreenState();
-}
+  final Room room;
+  final ChatController controller = Get.find();
+  final TextEditingController messageTec = TextEditingController();
+  final ScrollController scrollController = ScrollController();
 
-class MessageData {
-  bool wasSentBySelf;
-  String message;
-  String user;
-  MessageData(this.user, this.message, this.wasSentBySelf);
-}
-
-class _ConversationScreenState extends State<ConversationScreen> {
-  List<MessageData> messages = [
-    MessageData("user1", "Message 1", true),
-    MessageData(
-        "user2",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-        false),
-    MessageData("user1", "Message 3", true),
-    MessageData("user1", "Messagealdkfj 3", true),
-    MessageData("user2", "Message 4", false),
-    MessageData("user2", "Messageadlfkj 5", false),
-    MessageData("user2", "Message 6", false),
-  ];
+  void onSend() {
+    String content = messageTec.text;
+    controller.sendMessage(room, content);
+    scrollController.animateTo(scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    messageTec.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,31 +29,30 @@ class _ConversationScreenState extends State<ConversationScreen> {
         body: Column(
           children: [
             Expanded(child: messageList(context)),
+            //TODO: message sending indicator
             sendMessageBar(),
           ],
         ));
   }
 
-  Widget messageList(BuildContext context) => ListView.builder(
-      itemCount: messages.length,
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        bool isBottomOfChain = index == messages.length - 1 ||
-            messages[index + 1].user != messages[index].user;
-        bool isTopOfChain =
-            index == 0 || messages[index - 1].user != messages[index].user;
+  Widget messageList(BuildContext context) => Obx(() {
+        List<Message> messages = controller.messages[room.id]!;
+        return ListView.builder(
+            itemCount: messages.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              bool isBottomOfChain = index == messages.length - 1 ||
+                  messages[index + 1].sender != messages[index].sender;
+              bool isTopOfChain = index == 0 ||
+                  messages[index - 1].sender != messages[index].sender;
 
-        return MessageBubble(
-          messages[index].message,
-          messages[index].wasSentBySelf,
-          isTopOfChain,
-          isBottomOfChain,
-          user: "Username",
-          avatar: "",
-        );
+              return MessageBubble(messages[index].payload,
+                  messages[index].wasSentBySelf, isTopOfChain, isBottomOfChain,
+                  user: controller.getUser(messages[index]));
+            });
       });
 
-  Widget sendMessageBar() => MessageBar("Write message...", () {});
+  Widget sendMessageBar() => MessageBar("Write message...", messageTec, onSend);
 
   AppBar customAppBar(BuildContext context) => AppBar(
         elevation: 0,

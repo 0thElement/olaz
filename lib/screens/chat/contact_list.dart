@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/room.dart';
+import 'package:olaz/screens/chat/chat_controller.dart';
 import 'package:olaz/widgets/contact_item.dart';
 import 'package:olaz/widgets/popup_item.dart';
 
-class ContactScreen extends StatefulWidget {
+class ContactScreen extends GetView<ChatController> {
   const ContactScreen({Key? key}) : super(key: key);
 
-  @override
-  State<ContactScreen> createState() => _ContactScreenState();
-}
-
-class _ContactScreenState extends State<ContactScreen> {
   List<PopupMenuItem> addPopupMenuButtonItems() {
     return [
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
@@ -43,16 +41,17 @@ class _ContactScreenState extends State<ContactScreen> {
                 })
           ],
         ),
-        body: (ListView.builder(
-            itemCount: 10,
+        body: controller.obx((state) => ListView.builder(
+            itemCount: state?.length ?? 0,
             shrinkWrap: true,
             itemBuilder: ((context, index) {
+              Room room = state![index];
               return ContactItem(
-                  "name",
-                  "hi",
+                  room,
+                  controller.messages[room.id]?.last.payload ?? "",
                   "https://cdn.discordapp.com/avatars/941261266670985248/58ae7c0c0ee9363f4f8607a4060c281c.png?size=256",
                   "1h",
-                  index);
+                  0);
             }))));
   }
 }

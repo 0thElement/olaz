@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 class MessageBar extends StatelessWidget {
   final String hint;
+  final TextEditingController textEditingController;
   final VoidCallback onSend;
-  const MessageBar(this.hint, this.onSend, {Key? key}) : super(key: key);
+  const MessageBar(this.hint, this.textEditingController, this.onSend,
+      {Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +20,7 @@ class MessageBar extends StatelessWidget {
           //Text field
           Expanded(
             child: TextField(
+              controller: textEditingController,
               keyboardType: TextInputType.multiline,
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(

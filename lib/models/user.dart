@@ -44,6 +44,8 @@ class User {
 class UserCrud {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Map<String, User> cache = {};
+
   Future<void> addFriend(String userId, String friendId) async {
     DocumentReference userDoc = _firestore.collection("user").doc(userId);
     DocumentReference friendDoc = _firestore.collection("user").doc(friendId);
@@ -75,10 +77,13 @@ class UserCrud {
   }
 
   Future<User> get(String userId) async {
+    if (cache.containsKey(userId)) return cache[userId]!;
     DocumentReference<Map<String, dynamic>> userDoc =
         _firestore.collection("user").doc(userId);
 
-    return User.fromDocumentSnapshot(await userDoc.get());
+    User user = User.fromDocumentSnapshot(await userDoc.get());
+    cache[userId] = user;
+    return user;
   }
 
   Future<void> update(String userId, User user) async {

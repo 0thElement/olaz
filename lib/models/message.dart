@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:olaz/models/user.dart';
 
 class Message {
   String id = '';
@@ -8,8 +9,10 @@ class Message {
   Timestamp createdAt;
   Timestamp? updatedAt;
 
+  bool get wasSentBySelf => sender == 'TEMPORARY';
+
   Message(
-      {required this.id,
+      {this.id = '',
       required this.payload,
       required this.sender,
       required this.createdAt,
@@ -45,15 +48,19 @@ class MessageCrud {
   CollectionReference _roomCollectionOf(String roomId) =>
       _firestore.collection("message").doc(roomId).collection(roomId);
 
-  Stream<QuerySnapshot> roomMessageStream(String roomId, int limit) {
+  Stream<List<Message>> roomMessageStream(String roomId, int limit) {
     return _roomCollectionOf(roomId)
         .orderBy("timestamp", descending: true)
         .limit(limit)
-        .snapshots();
+        .snapshots()
+        .map((QuerySnapshot querySnapshot) => querySnapshot.docs
+            .map((e) => Message.fromDocumentSnapshot(
+                e as QueryDocumentSnapshot<Map<String, dynamic>>))
+            .toList());
   }
 
-  String sendMessage(
-      String roomId, String senderId, String payload, List<String>? files) {
+  Future<String> sendMessage(String roomId, String senderId, String payload,
+      List<String>? files) async {
     DocumentReference doc = _roomCollectionOf(roomId).doc();
     Message message = Message(
         id: doc.id,
@@ -63,7 +70,7 @@ class MessageCrud {
         updatedAt: Timestamp.now(),
         createdAt: Timestamp.now());
 
-    _firestore.runTransaction((transaction) async {
+    await _firestore.runTransaction((transaction) async {
       transaction.set(doc, message.toMap());
     });
 

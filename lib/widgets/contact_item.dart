@@ -1,29 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/room.dart';
 import 'package:olaz/screens/chat/conversation.dart';
 
-class ContactItem extends StatefulWidget {
-  final String name;
+class ContactItem extends StatelessWidget {
+  final Room room;
   final String messageText;
   final String image;
   final String time;
   final int unreadCount;
   const ContactItem(
-      this.name, this.messageText, this.image, this.time, this.unreadCount,
+      this.room, this.messageText, this.image, this.time, this.unreadCount,
       {Key? key})
       : super(key: key);
 
   @override
-  State<ContactItem> createState() => _ContactItemState();
-}
-
-class _ContactItemState extends State<ContactItem> {
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return ConversationScreen();
-        }));
+        Get.to(ConversationScreen(room));
       },
       child: Container(
         color: Colors.transparent,
@@ -34,7 +29,7 @@ class _ContactItemState extends State<ContactItem> {
             children: [
               //Avatar
               CircleAvatar(
-                backgroundImage: NetworkImage(widget.image),
+                backgroundImage: NetworkImage(image),
                 maxRadius: 30,
               ),
               const SizedBox(
@@ -46,7 +41,7 @@ class _ContactItemState extends State<ContactItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      widget.name,
+                      room.name,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.w500),
                     ),
@@ -54,7 +49,7 @@ class _ContactItemState extends State<ContactItem> {
                       height: 6,
                     ),
                     Text(
-                      widget.messageText,
+                      messageText,
                       style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
@@ -68,19 +63,19 @@ class _ContactItemState extends State<ContactItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    widget.time,
+                    time,
                     style: const TextStyle(
                         fontSize: 12, fontWeight: FontWeight.normal),
                   ),
                   const SizedBox(
                     height: 6,
                   ),
-                  (widget.unreadCount != 0)
+                  (unreadCount != 0)
                       ? Container(
                           width: 16,
                           height: 16,
                           child: Text(
-                            widget.unreadCount.toString(),
+                            unreadCount.toString(),
                             style: const TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                           ),

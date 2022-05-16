@@ -3,6 +3,7 @@ import 'package:olaz/models/message.dart';
 import 'package:olaz/models/post.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';
+import 'package:olaz/screens/chat/chat_controller.dart';
 import 'screens/homepage.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +15,7 @@ Future<void> main() async {
   Get.put(MessageCrud());
   Get.put(UserCrud());
   Get.put(PostCrud());
+  Get.put(ChatController());
   runApp(const MyApp());
 }
 
