@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logging/logging.dart';
+import 'package:olaz/screens/homepage.dart';
 import 'package:olaz/services/auth.dart';
 
 class LoginController extends GetxController {
@@ -48,15 +49,20 @@ class LoginController extends GetxController {
     }
   }
 
-  // Api Simulation
-  Future<bool> checkUser(String user, String password) {
-    logger.info("checkUser");
-    AuthService().signInWithGoogle();
+  Future<bool> checkUser(String user, String password) async {
+    var userCredential = await AuthService().signInWithGoogle();
+    print(userCredential);
     return Future.value(true);
   }
 
   Future signInWithGoogle() async {
-    AuthService().signInWithGoogle();
+    var userCredential = await AuthService().signInWithGoogle();
+    if (userCredential == null) {
+      Get.snackbar('Login', 'Login failed');
+      return Future.value(false);
+    }
+    Get.snackbar('Login', 'Login successfully');
+    Get.to(HomePage());
     return Future.value(true);
   }
 

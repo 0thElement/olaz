@@ -1,9 +1,10 @@
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:olaz/screens/chat/contact_list.dart';
 import 'package:olaz/screens/login/login.dart';
-import 'package:olaz/screens/social/wall.dart';
 import 'package:olaz/screens/profile/profile.dart';
-import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:olaz/screens/social/wall.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print(FirebaseAuth.instance.currentUser);
     return Scaffold(
       body: _screens[_screenIndex],
       bottomNavigationBar: BottomNavyBar(
