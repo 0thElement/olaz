@@ -45,7 +45,6 @@ class AuthService {
           .createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (err) {
       logger.shout(err.toString());
-      print(err);
     }
     return null;
   }

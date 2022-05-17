@@ -28,7 +28,7 @@ class CommentScreen extends StatelessWidget {
                         "comment", index % 2 == 0, true, true, "",
                         userId: null);
                   })),
-          MessageBar("Write a comment...", messageTec, () {})
+          MessageBar("Write a comment...", messageTec, () {}, () {})
         ],
       ),
     );

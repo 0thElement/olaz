@@ -6,7 +6,6 @@ import 'package:olaz/models/room.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/contact_item.dart';
 import 'package:olaz/widgets/popup_item.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 class ContactScreen extends GetView<ChatController> {
   const ContactScreen({Key? key}) : super(key: key);
@@ -52,7 +51,6 @@ class ContactScreen extends GetView<ChatController> {
               itemBuilder: ((context, index) => Obx(() {
                     Room room = state![index];
                     Message? latestMessage;
-
                     if (controller.messages[room.id] != null &&
                         controller.messages[room.id]!.isNotEmpty) {
                       latestMessage = controller.messages[room.id]!.last;

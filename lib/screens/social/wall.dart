@@ -57,7 +57,7 @@ class SocialWallScreen extends StatelessWidget {
                         5);
                   })),
             ),
-            MessageBar("Share your thought...", messageTec, () {})
+            MessageBar("Share your thought...", messageTec, () {}, () {})
           ],
         ));
   }

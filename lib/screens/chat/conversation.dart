@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
@@ -14,14 +16,25 @@ class ConversationScreen extends StatelessWidget {
   final Room room;
   final ChatController controller = Get.find();
   final TextEditingController messageTec = TextEditingController();
+  final FocusNode messageFocus = FocusNode();
   final ScrollController scrollController = ScrollController();
+
+  void scrollToBottom(int delay) {
+    Timer(Duration(milliseconds: delay), () {
+      if (scrollController.position.pixels <
+          scrollController.position.maxScrollExtent) {
+        scrollController.animateTo(scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      }
+    });
+  }
 
   void onSend() {
     String content = messageTec.text;
+    if (content.isEmpty) return;
     controller.sendMessage(room, content);
-    scrollController.animateTo(scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
     messageTec.clear();
+    scrollToBottom(350);
   }
 
   Widget avatar({double radius = 30}) {
@@ -31,14 +44,17 @@ class ConversationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    scrollToBottom(100);
     return Scaffold(
         appBar: customAppBar(context),
-        body: Column(
-          children: [
-            Expanded(child: messageList(context)),
-            //TODO: message sending indicator
-            sendMessageBar(),
-          ],
+        body: GestureDetector(
+          onTap: () {},
+          child: Column(
+            children: [
+              Expanded(child: messageList(context)),
+              sendMessageBar(),
+            ],
+          ),
         ));
   }
 
@@ -68,7 +84,8 @@ class ConversationScreen extends StatelessWidget {
             });
       });
 
-  Widget sendMessageBar() => MessageBar("Write message...", messageTec, onSend);
+  Widget sendMessageBar() => MessageBar(
+      "Write message...", messageTec, onSend, () => scrollToBottom(350));
 
   AppBar customAppBar(BuildContext context) => AppBar(
         elevation: 0,

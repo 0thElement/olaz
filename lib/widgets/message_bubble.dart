@@ -80,19 +80,24 @@ class MessageBubble extends StatelessWidget {
                 initialData: User.emptyUser,
                 future: Get.find<ChatController>().getUser(userId!),
                 builder: (context, snapshot) => Stack(
-                      children: shouldRenderSender()
-                          ? [
-                              bubble(),
-                              Positioned(
-                                  child: userAvatar(), left: 7, top: -20),
-                              Positioned(
-                                  child: username(snapshot.data?.name ?? ""),
-                                  left: 54,
-                                  top: -20),
-                            ]
-                          : [bubble()],
-                      clipBehavior: Clip.none,
-                    ))
+                  children: [
+                    Positioned(child: userAvatar(), left: 7, top: 0),
+                    Positioned(
+                        child: username(snapshot.data?.name ?? ""),
+                        left: 54,
+                        top: 0),
+                    Column(
+                      children: [
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        bubble()
+                      ],
+                    )
+                  ],
+                  clipBehavior: Clip.none,
+                ),
+              )
             : bubble());
   }
 }

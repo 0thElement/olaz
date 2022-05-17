@@ -38,10 +38,6 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
     messages[room.id] = <Message>[].obs;
     messages[room.id]!
         .bindStream(messageCrud.roomMessageStream(room.id, initialLimit));
-
-    ever(messages[room.id]!, (value) {
-      print("${room.id} message list: $value");
-    });
     roomMessagesLimit[room.id] = initialLimit;
     rooms.add(room);
   }
