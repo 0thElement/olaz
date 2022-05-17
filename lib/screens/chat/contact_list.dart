@@ -1,14 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/message.dart';
+import 'package:olaz/models/room.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/contact_item.dart';
+import 'package:olaz/widgets/popup_item.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
-class ContactScreen extends StatefulWidget {
+class ContactScreen extends GetView<ChatController> {
   const ContactScreen({Key? key}) : super(key: key);
 
-  @override
-  State<ContactScreen> createState() => _ContactScreenState();
-}
-
-class _ContactScreenState extends State<ContactScreen> {
   List<PopupMenuItem> addPopupMenuButtonItems() {
     return [
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
@@ -16,28 +18,9 @@ class _ContactScreenState extends State<ContactScreen> {
     ];
   }
 
-  PopupMenuItem createPopupItem(String text, String value, IconData icon) {
-    return PopupMenuItem(
-        child: Text.rich(
-          TextSpan(children: [
-            WidgetSpan(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: Icon(
-                    icon,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                alignment: PlaceholderAlignment.middle),
-            TextSpan(text: text)
-          ]),
-          style: TextStyle(color: Colors.grey[700]),
-        ),
-        value: value);
-  }
-
   @override
   Widget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser != null) controller.fetchMessages();
     return Scaffold(
         appBar: AppBar(
           title: const TextField(
@@ -53,22 +36,31 @@ class _ContactScreenState extends State<ContactScreen> {
           ),
           actions: [
             PopupMenuButton(
-                icon: const Icon(Icons.add),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.white70,
+                ),
                 itemBuilder: (context) {
                   return addPopupMenuButtonItems();
                 })
           ],
         ),
-        body: (ListView.builder(
-            itemCount: 10,
-            shrinkWrap: true,
-            itemBuilder: ((context, index) {
-              return ContactItem(
-                  "name",
-                  "hi",
-                  "https://thumbs.dreamstime.com/b/woman-praying-free-birds-to-nature-sunset-background-woman-praying-free-birds-enjoying-nature-sunset-99680945.jpg",
-                  "1h",
-                  index);
-            }))));
+        body: controller.obx(
+          (state) => ListView.builder(
+              itemCount: state?.length ?? 0,
+              shrinkWrap: true,
+              itemBuilder: ((context, index) {
+                Room room = state![index];
+                Message latestMessage = controller.messages[room.id]!.last;
+                DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
+                    latestMessage.createdAt.millisecondsSinceEpoch);
+                String time = timeago.format(durationAgo, locale: 'en_short');
+                return ContactItem(room, latestMessage.payload, time, 0);
+              })),
+          onEmpty: const Center(
+            child: Text("No contacts found. Press + to add a contact."),
+          ),
+          onLoading: const Center(child: CircularProgressIndicator()),
+        ));
   }
 }

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:olaz/screens/login/login_controller.dart';
+import 'package:olaz/controllers/login_controller.dart';
 
 class LoginPage extends GetView<LoginController> {
+  const LoginPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('LOGIN')),
+      appBar: AppBar(title: const Text('Login')),
       body: Container(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -25,18 +27,22 @@ class LoginPage extends GetView<LoginController> {
                 validator: controller.validator,
                 obscureText: true,
               ),
-              RaisedButton(
-                child: Text('Login'),
+              ElevatedButton(
+                child: const Text('Login'),
                 onPressed: controller.login,
               ),
-              RaisedButton(
-                child: Text('Sign in with Google'),
+              ElevatedButton(
+                child: const Text('Register'),
+                onPressed: controller.register,
+              ),
+              ElevatedButton(
+                child: const Text('Sign in with Google'),
                 onPressed: controller.signInWithGoogle,
               ),
-              RaisedButton(
-                child: Text('Sign in with Facebook'),
-                onPressed: controller.signInWithFacebook,
-              )
+              // ElevatedButton(
+              //   child: const Text('Sign in with Facebook'),
+              //   onPressed: controller.signInWithFacebook,
+              // )
             ],
           ),
         ),

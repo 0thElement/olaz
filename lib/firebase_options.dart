@@ -59,7 +59,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '419404396644',
     projectId: 'olaz-aebc9',
     storageBucket: 'olaz-aebc9.appspot.com',
-    iosClientId: '419404396644-pavtgqkngffph9aacaa9tg5561acrt0k.apps.googleusercontent.com',
+    iosClientId:
+        '419404396644-pavtgqkngffph9aacaa9tg5561acrt0k.apps.googleusercontent.com',
     iosBundleId: 'com.example.olaz',
   );
 }

@@ -1,29 +1,59 @@
-import 'package:flutter/material.dart';
-import 'package:olaz/screens/chat/conversation.dart';
+import 'dart:math';
 
-class ContactItem extends StatefulWidget {
-  final String name;
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/room.dart';
+import 'package:olaz/models/user.dart';
+import 'package:olaz/screens/chat/conversation.dart';
+import 'package:olaz/widgets/user_avatar.dart';
+
+class ContactItem extends StatelessWidget {
+  final Room room;
   final String messageText;
-  final String image;
   final String time;
   final int unreadCount;
-  const ContactItem(
-      this.name, this.messageText, this.image, this.time, this.unreadCount,
+
+  const ContactItem(this.room, this.messageText, this.time, this.unreadCount,
       {Key? key})
       : super(key: key);
 
-  @override
-  State<ContactItem> createState() => _ContactItemState();
-}
+  Widget avatar({double radius = 30}) {
+    List<String> ids = room.userIds;
+    String currentUser = Get.find<UserCrud>().currentUserId();
+    ids.remove(currentUser);
 
-class _ContactItemState extends State<ContactItem> {
+    if (ids.length == 1) {
+      return UserAvatar(ids.first, radius);
+    } else if (ids.length == 2) {
+      double r = radius / sqrt(2);
+      return Stack(
+        children: [
+          Positioned(child: UserAvatar(ids.first, r), left: 0, bottom: 0),
+          Positioned(child: UserAvatar(ids.last, r), top: 0, right: 0)
+        ],
+        clipBehavior: Clip.none,
+      );
+    } else {
+      double r = radius / 2;
+      return Stack(
+        children: [
+          Positioned(child: UserAvatar(ids[0], r), left: 0, top: 0),
+          Positioned(child: UserAvatar(ids[1], r), right: 0, top: 0),
+          Positioned(child: UserAvatar(ids[2], r), left: 0, bottom: 0),
+          ids.length >= 4
+              ? Positioned(child: UserAvatar(ids[3], r), left: 0, bottom: 0)
+              : const SizedBox(),
+        ],
+        clipBehavior: Clip.none,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return ConversationScreen();
-        }));
+        Get.to(ConversationScreen(room));
       },
       child: Container(
         color: Colors.transparent,
@@ -32,11 +62,7 @@ class _ContactItemState extends State<ContactItem> {
               const EdgeInsets.only(left: 20, right: 20, top: 12, bottom: 12),
           child: Row(
             children: [
-              //Avatar
-              CircleAvatar(
-                backgroundImage: NetworkImage(widget.image),
-                maxRadius: 30,
-              ),
+              avatar(),
               const SizedBox(
                 width: 20,
               ),
@@ -46,7 +72,7 @@ class _ContactItemState extends State<ContactItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      widget.name,
+                      room.name,
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.w500),
                     ),
@@ -54,7 +80,7 @@ class _ContactItemState extends State<ContactItem> {
                       height: 6,
                     ),
                     Text(
-                      widget.messageText,
+                      messageText,
                       style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
@@ -68,19 +94,19 @@ class _ContactItemState extends State<ContactItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    widget.time,
+                    time,
                     style: const TextStyle(
                         fontSize: 12, fontWeight: FontWeight.normal),
                   ),
                   const SizedBox(
                     height: 6,
                   ),
-                  (widget.unreadCount != 0)
+                  (unreadCount != 0)
                       ? Container(
                           width: 16,
                           height: 16,
                           child: Text(
-                            widget.unreadCount.toString(),
+                            unreadCount.toString(),
                             style: const TextStyle(color: Colors.white),
                             textAlign: TextAlign.center,
                           ),
