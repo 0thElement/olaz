@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/room.dart';
+import 'package:olaz/models/user.dart';
 import 'package:olaz/screens/chat/conversation.dart';
 import 'package:olaz/widgets/user_avatar.dart';
 
@@ -18,7 +19,7 @@ class ContactItem extends StatelessWidget {
 
   Widget avatar({double radius = 30}) {
     List<String> ids = room.userIds;
-    String currentUser = 'TEMPORARY';
+    String currentUser = Get.find<UserCrud>().currentUserId();
     ids.remove(currentUser);
 
     if (ids.length == 1) {

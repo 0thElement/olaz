@@ -1,4 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:get/get.dart';
+import 'package:olaz/models/user.dart';
 
 class Message {
   String id = '';
@@ -8,7 +10,7 @@ class Message {
   Timestamp createdAt;
   Timestamp? updatedAt;
 
-  bool get wasSentBySelf => sender == 'TEMPORARY';
+  bool get wasSentBySelf => sender == Get.find<UserCrud>().currentUserId();
 
   Message(
       {this.id = '',

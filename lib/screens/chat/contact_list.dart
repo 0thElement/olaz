@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
@@ -19,6 +20,7 @@ class ContactScreen extends GetView<ChatController> {
 
   @override
   Widget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser != null) controller.fetchMessages();
     return Scaffold(
         appBar: AppBar(
           title: const TextField(

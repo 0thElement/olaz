@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:olaz/screens/login/login_controller.dart';
+import 'package:olaz/controllers/login_controller.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({Key? key}) : super(key: key);
@@ -32,13 +32,17 @@ class LoginPage extends GetView<LoginController> {
                 onPressed: controller.login,
               ),
               ElevatedButton(
+                child: const Text('Register'),
+                onPressed: controller.register,
+              ),
+              ElevatedButton(
                 child: const Text('Sign in with Google'),
                 onPressed: controller.signInWithGoogle,
               ),
-              ElevatedButton(
-                child: const Text('Sign in with Facebook'),
-                onPressed: controller.signInWithFacebook,
-              )
+              // ElevatedButton(
+              //   child: const Text('Sign in with Facebook'),
+              //   onPressed: controller.signInWithFacebook,
+              // )
             ],
           ),
         ),

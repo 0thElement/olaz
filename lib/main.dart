@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/screens/login/login.dart';
 import 'package:olaz/screens/login/login_binding.dart';
+import 'package:olaz/controllers/login_controller.dart';
+import 'package:olaz/screens/profile/edit_profile.dart';
 import 'screens/homepage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -20,6 +23,9 @@ Future<void> main() async {
   Get.put(UserCrud());
   Get.put(PostCrud());
   Get.put(ChatController());
+  Get.put(LoginController());
+  Get.put(EditProfileScreenController());
+  Get.put(HomePageController());
   runApp(const MyApp());
 }
 
@@ -29,7 +35,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialRoute: "/login",
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       showSemanticsDebugger: false,
@@ -44,6 +49,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.lightBlue,
       ),
+      home: FirebaseAuth.instance.currentUser == null
+          ? const LoginPage()
+          : const HomePage(),
     );
   }
 }

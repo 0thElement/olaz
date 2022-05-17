@@ -3,6 +3,7 @@ import 'dart:isolate';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
+import 'package:olaz/utils/extensions.dart';
 import 'user.dart';
 
 class Room {
@@ -27,8 +28,8 @@ class Room {
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Room(
         id: snapshot.id,
-        name: snapshot.data()!["name"],
-        userIds: snapshot.data()!["user_ids"]);
+        name: snapshot.data()?["name"],
+        userIds: ((snapshot.data()?["user_ids"] ?? []) as List).toListString());
   }
 }
 

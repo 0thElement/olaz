@@ -1,42 +1,55 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
+import 'package:olaz/utils/extensions.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
+
 class User {
   String id = '';
-  String firebaseId = '';
   String name;
   List<String> friendIds = [];
   List<String> roomIds = [];
   String profilePicture;
+  Timestamp? dateOfBirth;
+  String phoneNumber;
+  String bio;
 
   User(
       {this.id = '',
-      required this.firebaseId,
       required this.name,
       this.friendIds = const [],
       this.roomIds = const [],
+      this.phoneNumber = '',
+      this.bio = '',
+      this.dateOfBirth,
       this.profilePicture = ''});
 
   static User fromDocumentSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return User(
         id: snapshot.id,
-        firebaseId: snapshot.data()!["firebase_id"],
-        name: snapshot.data()!["name"],
-        friendIds: snapshot.data()!["friends_id"],
-        roomIds: snapshot.data()!["room_ids"],
-        profilePicture: snapshot.data()!["profilePicture"]);
+        name: snapshot.data()?["name"] ?? '',
+        friendIds:
+            ((snapshot.data()?["friends_id"] ?? []) as List).toListString(),
+        roomIds: ((snapshot.data()?["room_ids"] ?? []) as List).toListString(),
+        profilePicture: snapshot.data()?["profilePicture"] ?? '',
+        dateOfBirth: snapshot.data()?["date_of_birth"],
+        phoneNumber: snapshot.data()?["phone_number"] ?? '',
+        bio: snapshot.data()?["bio"] ?? '');
   }
 
-  static User emptyUser = User(id: '', name: '', firebaseId: '');
+  static User emptyUser = User(id: '', name: '');
 
   Map<String, dynamic> toMap() {
     return {
-      "firebase_id": firebaseId,
       "name": name,
       "friends_id": friendIds,
       "room_ids": roomIds,
       "profilePicture": profilePicture,
+      "date_of_birth": dateOfBirth,
+      "phone_number": phoneNumber,
+      "bio": bio
     };
   }
 }
@@ -45,6 +58,17 @@ class UserCrud {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Map<String, User> cache = {};
+
+  Future<User> currentUser() async {
+    var currentUser = FirebaseAuth.instance.currentUser;
+    if (currentUser == null) {
+      return User.emptyUser;
+    } else {
+      return get(currentUser.uid);
+    }
+  }
+
+  String currentUserId() => FirebaseAuth.instance.currentUser?.uid ?? "";
 
   Future<void> addFriend(String userId, String friendId) async {
     DocumentReference userDoc = _firestore.collection("user").doc(userId);
@@ -77,7 +101,6 @@ class UserCrud {
   }
 
   Future<User> get(String userId) async {
-    if (cache.containsKey(userId)) return cache[userId]!;
     DocumentReference<Map<String, dynamic>> userDoc =
         _firestore.collection("user").doc(userId);
 
@@ -86,11 +109,21 @@ class UserCrud {
     return user;
   }
 
-  Future<void> update(String userId, User user) async {
-    await _firestore.collection("user").doc(userId).update(user.toMap());
+  Future<User> getCached(String userId) async {
+    //Unused for now
+    if (cache.containsKey(userId)) return cache[userId]!;
+    return get(userId);
+  }
+
+  Future<void> save(String userId, User user) async {
+    await _firestore.collection("user").doc(userId).set(user.toMap());
   }
 
   Future<void> delete(String userId) async {
     await _firestore.collection("user").doc(userId).delete();
+  }
+
+  Future<bool> userExists(String userId) async {
+    return (await _firestore.collection("user").doc(userId).get()).exists;
   }
 }

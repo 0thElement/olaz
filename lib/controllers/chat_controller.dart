@@ -22,15 +22,8 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
 
   final Map<String, int> roomMessagesLimit = {};
 
-  @override
-  void onInit() {
-    fetchMessages();
-    super.onInit();
-  }
-
   Future fetchMessages() async {
-    //TODO: GET CURRENT USER ID
-    String userId = 'TEMPORARY';
+    String userId = userCrud.currentUserId();
     //Listen to changes in rooms list
     _worker = ever(rooms, onRoomListChange);
     change(null, status: RxStatus.loading());
@@ -68,8 +61,7 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
 
   Future<void> sendMessage(Room room, String message,
       {List<String>? files}) async {
-    // TODO: TEST ONLY
-    String userId = 'TEMPORARY';
+    String userId = userCrud.currentUserId();
     String payload = message;
 
     if (message.contains('*')) {

@@ -1,14 +1,79 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/controllers/login_controller.dart';
+import 'package:olaz/models/user.dart';
+import 'package:olaz/widgets/user_avatar.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+class EditProfileScreenController extends GetxController {
+  Rx<DateTime> selectedDateOfBirth = DateTime.now().obs;
 
-  void logout() {}
+  User? user;
+
+  final TextEditingController nameTec = TextEditingController();
+  final TextEditingController phoneTec = TextEditingController();
+  final TextEditingController bioTec = TextEditingController();
+
+  UserCrud userCrud = Get.find();
+
+  Future save(bool isNewUser) async {
+    user!.bio = bioTec.text;
+    user!.phoneNumber = phoneTec.text;
+    user!.name = nameTec.text;
+    user!.dateOfBirth = Timestamp.fromDate(selectedDateOfBirth.value);
+    await Get.find<UserCrud>().save(user!.id, user!);
+    if (isNewUser) Get.offAllNamed('/home');
+
+    Get.snackbar('Successful', 'Your profile was updated');
+  }
+
+  Future getUserData(bool isNewUser) async {
+    var firebaseUser = firebase.FirebaseAuth.instance.currentUser!;
+    if (isNewUser) {
+      user = User(
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName ?? 'New user',
+          phoneNumber: firebaseUser.phoneNumber ?? '',
+          profilePicture: firebaseUser.photoURL ?? '');
+    } else {
+      user = await userCrud.get(firebaseUser.uid);
+    }
+    DateTime dateOfBirth = user!.dateOfBirth == null
+        ? DateTime.now()
+        : DateTime.fromMicrosecondsSinceEpoch(
+            user!.dateOfBirth!.microsecondsSinceEpoch);
+    selectedDateOfBirth(dateOfBirth);
+    nameTec.text = user!.name;
+    phoneTec.text = user!.phoneNumber;
+    bioTec.text = user!.bio;
+  }
+}
+
+class EditProfileScreen extends GetView<EditProfileScreenController> {
+  const EditProfileScreen({this.isNewUser = false, Key? key}) : super(key: key);
+
+  final bool isNewUser;
+
+  void logout() {
+    Get.find<LoginController>().signOut();
+  }
+
+  void save() {
+    controller.save(isNewUser);
+  }
+
+  DateTime currentDateOfBirth() {
+    Timestamp timestamp = controller.user?.dateOfBirth ?? Timestamp.now();
+    return DateTime.fromMicrosecondsSinceEpoch(
+        timestamp.microsecondsSinceEpoch);
+  }
 
   void uploadAvatar() {}
 
   @override
   Widget build(BuildContext context) {
+    controller.getUserData(isNewUser);
     return Scaffold(
         appBar: AppBar(
           title: const Text(
@@ -17,11 +82,19 @@ class EditProfileScreen extends StatelessWidget {
           ),
           actions: [
             IconButton(
-                onPressed: logout,
+                onPressed: save,
                 icon: const Icon(
-                  Icons.logout,
+                  Icons.save,
                   color: Colors.white,
-                ))
+                )),
+            isNewUser
+                ? const SizedBox()
+                : IconButton(
+                    onPressed: logout,
+                    icon: const Icon(
+                      Icons.logout,
+                      color: Colors.white,
+                    ))
           ],
         ),
         body: SingleChildScrollView(
@@ -35,16 +108,18 @@ class EditProfileScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(20),
                     child: Column(children: [
                       label("Date of birth", constraints.maxWidth),
-                      CalendarDatePicker(
-                          initialDate: DateTime.now(),
+                      Obx(() => CalendarDatePicker(
+                          initialDate: controller.selectedDateOfBirth.value,
                           firstDate: DateTime.fromMicrosecondsSinceEpoch(0),
                           lastDate: DateTime.now(),
-                          onDateChanged: (_) {}),
+                          onDateChanged: (value) {
+                            controller.selectedDateOfBirth(value);
+                          })),
                       const SizedBox(
                         height: 20,
                       ),
                       label("Bio", constraints.maxWidth),
-                      textField(TextEditingController(),
+                      textField(controller.bioTec,
                           hint: "Describe yourself...",
                           inputType: TextInputType.multiline)
                     ]),
@@ -65,10 +140,7 @@ class EditProfileScreen extends StatelessWidget {
             children: [
               GestureDetector(
                 onTap: uploadAvatar,
-                child: const CircleAvatar(
-                  backgroundImage: NetworkImage(""),
-                  radius: 50,
-                ),
+                child: UserAvatar(controller.user?.id ?? "", 50),
               ),
               TextButton(
                   onPressed: uploadAvatar,
@@ -82,14 +154,13 @@ class EditProfileScreen extends StatelessWidget {
           child: Column(
             children: [
               label("Name", constraints.maxWidth * 0.6),
-              textField(TextEditingController(text: "Username"),
+              textField(controller.nameTec,
                   hint: "Username", inputType: TextInputType.name),
               const SizedBox(
                 height: 20,
               ),
               label("Phone number", constraints.maxWidth * 0.6),
-              textField(TextEditingController(text: "0987654321"),
-                  inputType: TextInputType.phone)
+              textField(controller.phoneTec, inputType: TextInputType.phone)
             ],
           ),
         ),
