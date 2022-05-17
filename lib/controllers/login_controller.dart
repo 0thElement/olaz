@@ -1,10 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logging/logging.dart';
-import 'package:olaz/models/user.dart' as olaz;
-import 'package:olaz/screens/homepage.dart';
-import 'package:olaz/screens/profile/edit_profile.dart';
 import 'package:olaz/services/auth.dart';
 
 class LoginController extends GetxController {

@@ -26,6 +26,8 @@ class Room {
 
   static Room fromDocumentSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    print(snapshot.id);
+    print(snapshot.data());
     return Room(
         id: snapshot.id,
         name: snapshot.data()?["name"],

@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:olaz/models/user.dart';
 import 'package:olaz/widgets/icon_text.dart';
+import 'package:olaz/utils/extensions.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({required this.user, Key? key}) : super(key: key);
+
+  final User user;
 
   void toggleAddToContact() {}
 
-  final String username = "Username";
-  final String dateOfBirth = "2000/1/1";
-  final String phoneNumber = "0987654321";
-
   @override
   Widget build(BuildContext context) {
+    String username = user.name;
+    String dateOfBirth = user.dateOfBirth?.toDate().format() ?? "Not provided";
+    String phoneNumber =
+        user.phoneNumber == "" ? "Not provided" : user.phoneNumber;
+    String bio = user.bio == "" ? "Not provided" : user.bio;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -70,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
             height: 30,
           ),
           Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+            bio,
             style: TextStyle(color: Colors.grey[700]),
           ),
         ]),

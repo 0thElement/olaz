@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/user.dart';
+import 'package:olaz/utils/extensions.dart';
 
 class Message {
   String id = '';
@@ -34,11 +35,11 @@ class Message {
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Message(
       id: snapshot.id,
-      createdAt: snapshot.data()!["created_at"],
-      updatedAt: snapshot.data()!["updated_at"],
-      sender: snapshot.data()!["sender"],
-      payload: snapshot.data()!["payload"],
-      files: snapshot.data()!["files"],
+      createdAt: snapshot.data()?["created_at"],
+      updatedAt: snapshot.data()?["updated_at"],
+      sender: snapshot.data()?["sender"],
+      payload: snapshot.data()?["payload"],
+      files: ((snapshot.data()?["files"] ?? []) as List).toListString(),
     );
   }
 }
@@ -51,7 +52,7 @@ class MessageCrud {
 
   Stream<List<Message>> roomMessageStream(String roomId, int limit) {
     return _roomCollectionOf(roomId)
-        .orderBy("timestamp", descending: true)
+        .orderBy("created_at", descending: false)
         .limit(limit)
         .snapshots()
         .map((QuerySnapshot querySnapshot) => querySnapshot.docs

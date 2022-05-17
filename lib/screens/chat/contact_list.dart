@@ -49,14 +49,16 @@ class ContactScreen extends GetView<ChatController> {
           (state) => ListView.builder(
               itemCount: state?.length ?? 0,
               shrinkWrap: true,
-              itemBuilder: ((context, index) {
-                Room room = state![index];
-                Message latestMessage = controller.messages[room.id]!.last;
-                DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
-                    latestMessage.createdAt.millisecondsSinceEpoch);
-                String time = timeago.format(durationAgo, locale: 'en_short');
-                return ContactItem(room, latestMessage.payload, time, 0);
-              })),
+              itemBuilder: ((context, index) => Obx(() {
+                    Room room = state![index];
+                    Message? latestMessage;
+
+                    if (controller.messages[room.id] != null &&
+                        controller.messages[room.id]!.isNotEmpty) {
+                      latestMessage = controller.messages[room.id]!.last;
+                    }
+                    return ContactItem(room, latestMessage, 0);
+                  }))),
           onEmpty: const Center(
             child: Text("No contacts found. Press + to add a contact."),
           ),

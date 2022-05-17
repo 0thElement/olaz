@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/user.dart';
 import 'package:olaz/controllers/chat_controller.dart';
+import 'package:olaz/widgets/user_avatar.dart';
 
 class MessageBubble extends StatelessWidget {
   final String? userId;
@@ -19,9 +20,10 @@ class MessageBubble extends StatelessWidget {
 
   bool shouldRenderSender() => !wasSentBySelf && userId != null && isTopOfChain;
 
-  Widget userAvatar(String avatar) => CircleAvatar(
-        backgroundImage: NetworkImage(avatar),
-        maxRadius: 20,
+  Widget userAvatar() => UserAvatar(
+        userId,
+        20,
+        interactable: true,
       );
 
   Widget username(String name) => Text(
@@ -71,7 +73,7 @@ class MessageBubble extends StatelessWidget {
           left: 0,
           right: 14,
           top: isTopOfChain ? 10 : 2,
-          bottom: isBottomOfChain ? 10 : 2,
+          bottom: isBottomOfChain ? 25 : 2,
         ),
         child: shouldRenderSender()
             ? FutureBuilder<User>(
@@ -82,10 +84,7 @@ class MessageBubble extends StatelessWidget {
                           ? [
                               bubble(),
                               Positioned(
-                                  child: userAvatar(
-                                      snapshot.data?.profilePicture ?? ""),
-                                  left: 7,
-                                  top: -20),
+                                  child: userAvatar(), left: 7, top: -20),
                               Positioned(
                                   child: username(snapshot.data?.name ?? ""),
                                   left: 54,

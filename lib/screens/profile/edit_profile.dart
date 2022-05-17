@@ -9,7 +9,7 @@ import 'package:olaz/widgets/user_avatar.dart';
 class EditProfileScreenController extends GetxController {
   Rx<DateTime> selectedDateOfBirth = DateTime.now().obs;
 
-  User? user;
+  Rx<User?> user = User.emptyUser.obs;
 
   final TextEditingController nameTec = TextEditingController();
   final TextEditingController phoneTec = TextEditingController();
@@ -18,11 +18,11 @@ class EditProfileScreenController extends GetxController {
   UserCrud userCrud = Get.find();
 
   Future save(bool isNewUser) async {
-    user!.bio = bioTec.text;
-    user!.phoneNumber = phoneTec.text;
-    user!.name = nameTec.text;
-    user!.dateOfBirth = Timestamp.fromDate(selectedDateOfBirth.value);
-    await Get.find<UserCrud>().save(user!.id, user!);
+    user.value!.bio = bioTec.text;
+    user.value!.phoneNumber = phoneTec.text;
+    user.value!.name = nameTec.text;
+    user.value!.dateOfBirth = Timestamp.fromDate(selectedDateOfBirth.value);
+    await Get.find<UserCrud>().save(user.value!.id, user.value!);
     if (isNewUser) Get.offAllNamed('/home');
 
     Get.snackbar('Successful', 'Your profile was updated');
@@ -31,22 +31,21 @@ class EditProfileScreenController extends GetxController {
   Future getUserData(bool isNewUser) async {
     var firebaseUser = firebase.FirebaseAuth.instance.currentUser!;
     if (isNewUser) {
-      user = User(
+      user(User(
           id: firebaseUser.uid,
           name: firebaseUser.displayName ?? 'New user',
           phoneNumber: firebaseUser.phoneNumber ?? '',
-          profilePicture: firebaseUser.photoURL ?? '');
+          profilePicture: firebaseUser.photoURL ?? ''));
     } else {
-      user = await userCrud.get(firebaseUser.uid);
+      user(await userCrud.get(firebaseUser.uid));
     }
-    DateTime dateOfBirth = user!.dateOfBirth == null
+    DateTime dateOfBirth = user.value!.dateOfBirth == null
         ? DateTime.now()
-        : DateTime.fromMicrosecondsSinceEpoch(
-            user!.dateOfBirth!.microsecondsSinceEpoch);
+        : user.value!.dateOfBirth!.toDate();
     selectedDateOfBirth(dateOfBirth);
-    nameTec.text = user!.name;
-    phoneTec.text = user!.phoneNumber;
-    bioTec.text = user!.bio;
+    nameTec.text = user.value!.name;
+    phoneTec.text = user.value!.phoneNumber;
+    bioTec.text = user.value!.bio;
   }
 }
 
@@ -64,9 +63,8 @@ class EditProfileScreen extends GetView<EditProfileScreenController> {
   }
 
   DateTime currentDateOfBirth() {
-    Timestamp timestamp = controller.user?.dateOfBirth ?? Timestamp.now();
-    return DateTime.fromMicrosecondsSinceEpoch(
-        timestamp.microsecondsSinceEpoch);
+    Timestamp timestamp = controller.user.value?.dateOfBirth ?? Timestamp.now();
+    return timestamp.toDate();
   }
 
   void uploadAvatar() {}
@@ -139,9 +137,8 @@ class EditProfileScreen extends GetView<EditProfileScreenController> {
           child: Column(
             children: [
               GestureDetector(
-                onTap: uploadAvatar,
-                child: UserAvatar(controller.user?.id ?? "", 50),
-              ),
+                  onTap: uploadAvatar,
+                  child: Obx(() => UserAvatar(controller.user.value?.id, 50))),
               TextButton(
                   onPressed: uploadAvatar,
                   child: const Text("Upload an avatar"))

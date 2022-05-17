@@ -5,6 +5,7 @@ import 'package:olaz/models/room.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/message_bubble.dart';
+import 'package:olaz/widgets/user_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 class ConversationScreen extends StatelessWidget {
@@ -23,6 +24,11 @@ class ConversationScreen extends StatelessWidget {
     messageTec.clear();
   }
 
+  Widget avatar({double radius = 30}) {
+    List<String> ids = room.userIds.map((s) => s.trim()).toList();
+    return GroupAvatar(ids, radius);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +45,7 @@ class ConversationScreen extends StatelessWidget {
   Widget messageList(BuildContext context) => Obx(() {
         List<Message> messages = controller.messages[room.id]!;
         return ListView.builder(
+            controller: scrollController,
             itemCount: messages.length,
             shrinkWrap: true,
             itemBuilder: (context, index) {
@@ -79,10 +86,7 @@ class ConversationScreen extends StatelessWidget {
                         onPressed: () => Navigator.pop(context),
                         icon:
                             const Icon(Icons.arrow_back, color: Colors.white)),
-                    const CircleAvatar(
-                      backgroundImage: NetworkImage(""),
-                      maxRadius: 20,
-                    ),
+                    avatar(radius: 20),
                     // User avatar, username, status
                     const SizedBox(
                       width: 15,
@@ -111,9 +115,9 @@ class ConversationScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              "Username",
-              style: TextStyle(
+            Text(
+              room.name,
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
@@ -123,18 +127,18 @@ class ConversationScreen extends StatelessWidget {
             ),
             Row(
               children: [
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: const BoxDecoration(
-                      color: Colors.green, shape: BoxShape.circle),
-                ),
-                const SizedBox(
-                  width: 6,
-                ),
-                const Text(
-                  "Online",
-                  style: TextStyle(color: Colors.white70),
+                // Container(
+                //   width: 10,
+                //   height: 10,
+                //   decoration: const BoxDecoration(
+                //       color: Colors.green, shape: BoxShape.circle),
+                // ),
+                // const SizedBox(
+                //   width: 6,
+                // ),
+                Text(
+                  "${room.userIds.length} members",
+                  style: const TextStyle(color: Colors.white70),
                 ),
               ],
             )

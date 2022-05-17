@@ -23,17 +23,25 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
   final Map<String, int> roomMessagesLimit = {};
 
   Future fetchMessages() async {
+    rooms.clear();
     String userId = userCrud.currentUserId();
     //Listen to changes in rooms list
     _worker = ever(rooms, onRoomListChange);
     change(null, status: RxStatus.loading());
-    (await roomCrud.getRoomsOfUser(userId)).forEach(addRoom);
+    List<Room> roomList = await roomCrud.getRoomsOfUser(userId);
+    roomList.forEach(addRoom);
+
+    if (roomList.isEmpty) change(null, status: RxStatus.empty());
   }
 
   void addRoom(Room room) {
     messages[room.id] = <Message>[].obs;
     messages[room.id]!
         .bindStream(messageCrud.roomMessageStream(room.id, initialLimit));
+
+    ever(messages[room.id]!, (value) {
+      print("${room.id} message list: $value");
+    });
     roomMessagesLimit[room.id] = initialLimit;
     rooms.add(room);
   }
