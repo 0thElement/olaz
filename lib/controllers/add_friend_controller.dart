@@ -43,9 +43,5 @@ class AddFriendController extends GetxController with StateMixin<List<User>> {
     super.onClose();
   }
 
-  void clear() {
-    searchController.clear();
-  }
-
   Future<List<User>> searchFriend(String name) => userCrud.search(name);
 }
