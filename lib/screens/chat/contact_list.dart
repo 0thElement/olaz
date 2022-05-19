@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:olaz/controllers/add_friend_controller.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
-import 'package:olaz/controllers/chat_controller.dart';
+import 'package:olaz/screens/chat/add_friend.dart';
 import 'package:olaz/widgets/contact_item.dart';
 import 'package:olaz/widgets/popup_item.dart';
 
@@ -35,6 +37,13 @@ class ContactScreen extends GetView<ChatController> {
           ),
           actions: [
             PopupMenuButton(
+                onSelected: (value) {
+                  switch (value) {
+                    case 'friend':
+                      Get.lazyPut(() => AddFriendController());
+                      Get.to(() => AddFriendScreen());
+                  }
+                },
                 icon: const Icon(
                   Icons.add,
                   color: Colors.white70,
