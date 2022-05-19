@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/models/user.dart';
-import 'package:get/get.dart';
 import 'package:olaz/screens/profile/profile.dart';
 
 class UserAvatar extends StatelessWidget {
@@ -20,7 +20,7 @@ class UserAvatar extends StatelessWidget {
         onTap: () async {
           if (userId != null) {
             User user = await Get.find<UserCrud>().get(userId!);
-            Get.to(ProfileScreen(user: user));
+            Get.to(() => ProfileScreen(user: user));
           }
         },
         child: widget,

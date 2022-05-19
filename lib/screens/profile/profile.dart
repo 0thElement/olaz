@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olaz/models/user.dart';
-import 'package:olaz/widgets/icon_text.dart';
 import 'package:olaz/utils/extensions.dart';
+import 'package:olaz/widgets/icon_text.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({required this.user, Key? key}) : super(key: key);
@@ -9,6 +9,18 @@ class ProfileScreen extends StatelessWidget {
   final User user;
 
   void toggleAddToContact() {}
+
+  Widget avatar() {
+    if (user.profilePicture == "")
+      return CircleAvatar(
+        radius: 80,
+        backgroundColor: Colors.lightBlue[100],
+      );
+    return CircleAvatar(
+      radius: 80,
+      backgroundImage: NetworkImage(user.profilePicture),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +44,7 @@ class ProfileScreen extends StatelessWidget {
           Align(
             alignment: Alignment.center,
             child: Column(children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage(""),
-                radius: 80,
-              ),
+              avatar(),
               const SizedBox(
                 height: 20,
               ),

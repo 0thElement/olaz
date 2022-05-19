@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 
-import 'package:olaz/utils/extensions.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:olaz/utils/extensions.dart';
 
 class User {
   String id = '';
@@ -37,6 +36,25 @@ class User {
         dateOfBirth: snapshot.data()?["date_of_birth"],
         phoneNumber: snapshot.data()?["phone_number"] ?? '',
         bio: snapshot.data()?["bio"] ?? '');
+  }
+
+  static List<User> fromQuerySnapshot(
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<User> list = List.empty(growable: true);
+    for (var element in snapshot.docs) {
+      var data = element.data();
+      list.add(User(
+        id: element.id,
+        name: data['name'] ?? '',
+        friendIds: ((data['friends_id'] ?? []) as List).toListString(),
+        roomIds: ((data['room_ids'] ?? []) as List).toListString(),
+        profilePicture: data['profilePicture'] ?? '',
+        phoneNumber: data['phoneNumber'] ?? '',
+        bio: data['bio'] ?? '',
+        dateOfBirth: data['dateOfBirth'],
+      ));
+    }
+    return list;
   }
 
   static User emptyUser = User(id: '', name: '');
@@ -107,6 +125,17 @@ class UserCrud {
     User user = User.fromDocumentSnapshot(await userDoc.get());
     cache[userId] = user;
     return user;
+  }
+
+  Future<List<User>> search(String name) async {
+    Query<Map<String, dynamic>> userDoc =
+        _firestore.collection("user").where('name', isEqualTo: name);
+
+    List<User> list = User.fromQuerySnapshot(await userDoc.get());
+    // print(user);
+    // cache[user.id] = user;
+    return list;
+    // return null;
   }
 
   Future<User> getCached(String userId) async {
