@@ -1,28 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:http/http.dart' as http;
 
 class UploadImage extends StatefulWidget {
-  const UploadImage({ Key? key }) : super(key: key);
+  const UploadImage({Key? key}) : super(key: key);
 
   @override
   State<UploadImage> createState() => _UploadImageState();
 }
 
 class _UploadImageState extends State<UploadImage> {
-  XFile? _image;
-  List <XFile>? imageList = [];
-  int type = 1;
+  List<XFile> imageList = [];
 
   Future getImageFromGallery() async {
     final images = await ImagePicker().pickMultiImage();
 
     setState(() {
       if (images != null) {
-        imageList!.addAll(images);
-        type = 1;
-      } else {
-        print("No Image Selected");
+        imageList.addAll(images);
       }
     });
   }
@@ -32,10 +29,7 @@ class _UploadImageState extends State<UploadImage> {
 
     setState(() {
       if (image != null) {
-        _image = XFile(image.path);
-        type = 2;
-      } else {
-        print("No Image Selected");
+        imageList.add(image);
       }
     });
   }
@@ -46,7 +40,6 @@ class _UploadImageState extends State<UploadImage> {
       appBar: AppBar(
         title: const Text('Upload Image'),
       ),
-
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -56,37 +49,40 @@ class _UploadImageState extends State<UploadImage> {
               style: TextStyle(fontSize: 20),
             ),
           ),
-
           const SizedBox(
             height: 5,
           ),
-
           Padding(
             padding: const EdgeInsets.all(20),
-
             child: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: 200.0,
               child: Center(
-                child: _image == null ? const Text("No Image Selected") : 
-                (type == 2 ? Image.network(_image!.path) : 
-                Expanded(
-                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GridView.builder(
-                    itemCount: imageList!.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Image.network(imageList![index].path, fit: BoxFit.cover);
-                    },
-                  ),
-                 ),
-                )),
-                // child: _image == null ? const Text("No Image Selected") : Image.file(File(_image!.path)),
+                child: imageList.isEmpty
+                    ? const Text("No Image Selected")
+                    : (Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GridView.builder(
+                          itemCount: imageList.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3),
+                          itemBuilder: (BuildContext context, int index) {
+                            return GestureDetector(
+                              onTap: () => setState(() {
+                                imageList.removeAt(index);
+                              }),
+                              child: Image.file(
+                                File(imageList[index].path),
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        ),
+                      )),
               ),
             ),
           ),
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -95,7 +91,6 @@ class _UploadImageState extends State<UploadImage> {
                 tooltip: 'Choose Image From Camera',
                 child: const Icon(Icons.camera),
               ),
-
               FloatingActionButton(
                 onPressed: getImageFromGallery,
                 tooltip: 'Choose Image From Galerry',
