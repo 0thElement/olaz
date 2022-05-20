@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:olaz/models/user.dart';
+import 'package:olaz/screens/profile/profile.dart';
 import 'package:olaz/widgets/user_avatar.dart';
 
 class UserSearchItem extends StatelessWidget {
@@ -9,14 +11,16 @@ class UserSearchItem extends StatelessWidget {
   Widget avatar(String id) => UserAvatar(
         id,
         20,
-        interactable: true,
+        interactable: false,
       );
   @override
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
         return GestureDetector(
-          onTap: () {},
+          onTap: () async {
+            Get.to(() => ProfileScreen(user: user));
+          },
           child: Container(
             color: Colors.transparent,
             child: Padding(
@@ -28,13 +32,12 @@ class UserSearchItem extends StatelessWidget {
                   const SizedBox(
                     width: 20,
                   ),
-                  //Name and newest latestMessage
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          "${user.name}",
+                          user.name,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w500),
                         ),
@@ -42,7 +45,7 @@ class UserSearchItem extends StatelessWidget {
                           height: 6,
                         ),
                         Text(
-                          "${user.bio}",
+                          user.bio,
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -50,16 +53,6 @@ class UserSearchItem extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ),
-                  //Last send time and unread
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      IconButton(onPressed: () {}, icon: Icon(Icons.add)),
-                      const SizedBox(
-                        height: 6,
-                      ),
-                    ],
                   ),
                 ],
               ),

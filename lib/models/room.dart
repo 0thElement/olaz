@@ -13,13 +13,13 @@ class Room {
 
   Room({
     this.id = '',
-    required this.name,
+    this.name = '',
     this.userIds = const [],
   });
 
   Map<String, dynamic> toMap() {
     return {
-      "name": name,
+      // "name": name,
       "user_ids": userIds,
     };
   }
@@ -28,7 +28,7 @@ class Room {
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Room(
         id: snapshot.id,
-        name: snapshot.data()?["name"],
+        // name: snapshot.data()?["name"],
         userIds: ((snapshot.data()?["user_ids"] ?? []) as List).toListString());
   }
 }
@@ -63,7 +63,7 @@ class RoomCrud {
 
     Room room = Room(id: roomId, name: roomName, userIds: userIds);
 
-    _firestore.runTransaction((transaction) async {
+    await _firestore.runTransaction((transaction) async {
       transaction.update(roomDoc, room.toMap());
 
       for (int i = 0; i < users.length; i++) {
@@ -88,7 +88,7 @@ class RoomCrud {
     if (!user.roomIds.contains(roomId)) user.roomIds.add(roomId);
     if (!room.userIds.contains(roomId)) room.userIds.add(userId);
 
-    _firestore.runTransaction((transaction) async {
+    await _firestore.runTransaction((transaction) async {
       transaction.update(roomDoc, room.toMap());
       transaction.update(userDoc, user.toMap());
     });
@@ -106,7 +106,7 @@ class RoomCrud {
     if (user.roomIds.contains(roomId)) user.roomIds.remove(roomId);
     if (room.userIds.contains(roomId)) room.userIds.remove(userId);
 
-    _firestore.runTransaction((transaction) async {
+    await _firestore.runTransaction((transaction) async {
       transaction.update(roomDoc, room.toMap());
       transaction.update(userDoc, user.toMap());
     });
@@ -129,8 +129,8 @@ class RoomCrud {
     return Room.fromDocumentSnapshot(await roomDoc.get());
   }
 
-  Future<void> update(String roomId, Room room) async {
-    await _firestore.collection("room").doc(roomId).update(room.toMap());
+  Future<void> save(String roomId, Room room) async {
+    await _firestore.collection("room").doc(roomId).set(room.toMap());
   }
 
   Future<void> delete(String roomId) async {

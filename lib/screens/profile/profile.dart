@@ -1,34 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/models/user.dart';
 import 'package:olaz/utils/extensions.dart';
 import 'package:olaz/widgets/icon_text.dart';
+import 'package:olaz/widgets/user_avatar.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({required this.user, Key? key}) : super(key: key);
 
   final User user;
 
-  void toggleAddToContact() {}
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool isFriend = false;
+  UserCrud userCrud = Get.find();
+
+  @override
+  void initState() {
+    setState(() {
+      isFriend = widget.user.friendIds.contains(userCrud.currentUserId());
+    });
+    super.initState();
+  }
+
+  Future toggleAddToContact() async {
+    User currentUser = await userCrud.currentUser();
+    if (currentUser.friendIds.contains(widget.user.id)) {
+      print("remove");
+      await userCrud.removeFriend(currentUser.id, widget.user.id);
+      setState(() {
+        isFriend = false;
+      });
+    } else {
+      print("add");
+      await userCrud.addFriend(currentUser.id, widget.user.id);
+      setState(() {
+        isFriend = true;
+      });
+    }
+    Get.find<ChatController>().fetchMessages();
+  }
 
   Widget avatar() {
-    if (user.profilePicture == "")
-      return CircleAvatar(
-        radius: 80,
-        backgroundColor: Colors.lightBlue[100],
-      );
-    return CircleAvatar(
-      radius: 80,
-      backgroundImage: NetworkImage(user.profilePicture),
-    );
+    return UserAvatar(widget.user.id, 80);
   }
 
   @override
   Widget build(BuildContext context) {
-    String username = user.name;
-    String dateOfBirth = user.dateOfBirth?.toDate().format() ?? "Not provided";
-    String phoneNumber =
-        user.phoneNumber == "" ? "Not provided" : user.phoneNumber;
-    String bio = user.bio == "" ? "Not provided" : user.bio;
+    String username = widget.user.name;
+    String dateOfBirth =
+        widget.user.dateOfBirth?.toDate().format() ?? "Not provided";
+    String phoneNumber = widget.user.phoneNumber == ""
+        ? "Not provided"
+        : widget.user.phoneNumber;
+    String bio = widget.user.bio == "" ? "Not provided" : widget.user.bio;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,8 +90,13 @@ class ProfileScreen extends StatelessWidget {
           Center(
             child: ElevatedButton(
                 onPressed: toggleAddToContact,
-                child: iconText("Add to contact", Icons.person_add,
-                    const TextStyle(color: Colors.white), Colors.white)),
+                style: ElevatedButton.styleFrom(
+                    primary: isFriend ? Colors.grey : Colors.lightBlue),
+                child: iconText(
+                    isFriend ? "Remove from contact" : "Add to contact",
+                    Icons.person_add,
+                    const TextStyle(color: Colors.white),
+                    Colors.white)),
           ),
           const SizedBox(
             height: 30,

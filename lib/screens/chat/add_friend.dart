@@ -13,7 +13,7 @@ class AddFriendScreen extends GetView<AddFriendController> {
           title: TextField(
             controller: controller.searchController,
             cursorColor: Colors.white70,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 prefixIcon: Icon(
                   Icons.search,
                   color: Colors.white70,

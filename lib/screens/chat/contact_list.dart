@@ -41,7 +41,7 @@ class ContactScreen extends GetView<ChatController> {
                   switch (value) {
                     case 'friend':
                       Get.lazyPut(() => AddFriendController());
-                      Get.to(() => AddFriendScreen());
+                      Get.to(() => const AddFriendScreen());
                   }
                 },
                 icon: const Icon(

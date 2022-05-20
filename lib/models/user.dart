@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:olaz/models/room.dart';
 import 'package:olaz/utils/extensions.dart';
 
 class User {
@@ -62,6 +63,7 @@ class User {
   Map<String, dynamic> toMap() {
     return {
       "name": name,
+      "name_searchable": name.toUpperCase().replaceAll(" ", "_"),
       "friends_id": friendIds,
       "room_ids": roomIds,
       "profilePicture": profilePicture,
@@ -97,9 +99,20 @@ class UserCrud {
     if (!user.friendIds.contains(friendId)) user.friendIds.add(friendId);
     if (!friend.friendIds.contains(userId)) friend.friendIds.add(userId);
 
-    _firestore.runTransaction((transaction) async {
+    String roomId = userId.compareTo(friendId) > 0
+        ? "$userId - $friendId"
+        : "$friendId - $userId";
+    DocumentReference roomDoc = _firestore.collection("room").doc(roomId);
+    Room room =
+        Room(name: "${user.name}, ${friend.name}", userIds: [userId, friendId]);
+
+    if (!user.roomIds.contains(roomId)) user.roomIds.add(roomId);
+    if (!friend.roomIds.contains(roomId)) friend.friendIds.add(roomId);
+
+    await _firestore.runTransaction((transaction) async {
       transaction.update(friendDoc, friend.toMap());
       transaction.update(userDoc, user.toMap());
+      transaction.set(roomDoc, room.toMap());
     });
   }
 
@@ -112,9 +125,18 @@ class UserCrud {
     if (user.friendIds.contains(friendId)) user.friendIds.remove(friendId);
     if (friend.friendIds.contains(userId)) friend.friendIds.remove(userId);
 
-    _firestore.runTransaction((transaction) async {
+    String roomId = userId.compareTo(friendId) > 0
+        ? "$userId - $friendId"
+        : "$friendId - $userId";
+    DocumentReference roomDoc = _firestore.collection("room").doc(roomId);
+
+    if (user.roomIds.contains(roomId)) user.roomIds.remove(roomId);
+    if (friend.roomIds.contains(roomId)) friend.friendIds.remove(roomId);
+
+    await _firestore.runTransaction((transaction) async {
       transaction.update(friendDoc, friend.toMap());
       transaction.update(userDoc, user.toMap());
+      transaction.delete(roomDoc);
     });
   }
 
@@ -128,11 +150,15 @@ class UserCrud {
   }
 
   Future<List<User>> search(String name) async {
-    Query<Map<String, dynamic>> userDoc =
-        _firestore.collection("user").where('name', isEqualTo: name);
+    name = name.toUpperCase().replaceAll(' ', '_');
+    Query<Map<String, dynamic>> userDoc = _firestore
+        .collection("user")
+        .orderBy('name_searchable')
+        .where('name_searchable',
+            isGreaterThanOrEqualTo: name, isLessThanOrEqualTo: name + '\uf8ff');
 
     List<User> list = User.fromQuerySnapshot(await userDoc.get());
-    // print(user);
+    print(list);
     // cache[user.id] = user;
     return list;
     // return null;

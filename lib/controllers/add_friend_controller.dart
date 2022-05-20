@@ -6,13 +6,12 @@ import 'package:olaz/models/user.dart';
 class AddFriendController extends GetxController with StateMixin<List<User>> {
   final searchController = TextEditingController();
 
-  final _debouncer = Debouncer(delay: Duration(milliseconds: 500));
+  final _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
 
   UserCrud userCrud = Get.find();
 
   @override
   void onInit() {
-    // TODO: implement onInit
     searchController.clear();
     searchController.addListener(onSearchChange);
     super.onInit();
@@ -20,18 +19,25 @@ class AddFriendController extends GetxController with StateMixin<List<User>> {
 
   @override
   void onReady() {
-    // TODO: implement onReady
     change(null, status: RxStatus.empty());
     super.onReady();
   }
 
   void onSearchChange() {
     _debouncer.call(() async {
-      change(null, status: RxStatus.empty());
       var value = searchController.value.text;
-      if (value == "") return;
-      var list = await searchFriend(searchController.value.text);
-      if (list.isEmpty) return;
+      if (value == "") {
+        change(null, status: RxStatus.empty());
+        return;
+      }
+      change(null, status: RxStatus.loading());
+      var list = await userCrud.search(searchController.value.text);
+      print(value);
+      print(list);
+      if (list.isEmpty) {
+        change(null, status: RxStatus.empty());
+        return;
+      }
       // users.addAll(list);
       change(list, status: RxStatus.success());
     });

@@ -71,7 +71,9 @@ class ContactItem extends StatelessWidget {
                           height: 6,
                         ),
                         Text(
-                          "$username: $latestPayload",
+                          latestMessage == null
+                              ? "No messages yet"
+                              : "$username: $latestPayload",
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
