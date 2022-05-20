@@ -97,7 +97,7 @@ class UserCrud {
     if (!user.friendIds.contains(friendId)) user.friendIds.add(friendId);
     if (!friend.friendIds.contains(userId)) friend.friendIds.add(userId);
 
-    _firestore.runTransaction((transaction) async {
+    await _firestore.runTransaction((transaction) async {
       transaction.update(friendDoc, friend.toMap());
       transaction.update(userDoc, user.toMap());
     });

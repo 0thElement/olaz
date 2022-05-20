@@ -1,9 +1,8 @@
-import 'dart:isolate';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/utils/extensions.dart';
+
 import 'user.dart';
 
 class Room {
@@ -21,7 +20,38 @@ class Room {
     return {
       "name": name,
       "user_ids": userIds,
+      "name_search": buildNameSearch(name),
     };
+  }
+
+  Map<String, bool> buildNameSearch(String roomName) {
+    var roomNameSearch = List<String>.empty(growable: true);
+    var names = roomName.split(',').map((e) => e.trim());
+    for (var name in names) {
+      var nameSearch = buildPhraseSearch(name);
+      roomNameSearch.addAll(nameSearch);
+    }
+    var mapping = {for (var value in roomNameSearch) value: true};
+    return mapping;
+  }
+
+  List<String> buildPhraseSearch(String phrase) {
+    var words = phrase.split(' ').map((e) => e.trim());
+    var phraseSearch = List<String>.empty(growable: true);
+    var curWord = List<String>.empty(growable: true);
+    for (var value in words) {
+      var chars = value.split('');
+      var wordSearch = List<String>.empty(growable: true);
+      var cur = '';
+      for (var value1 in chars) {
+        cur += value1;
+        wordSearch.add(cur);
+      }
+      curWord.add(cur);
+      phraseSearch.addAll(wordSearch);
+      phraseSearch.add(curWord.join('_'));
+    }
+    return phraseSearch;
   }
 
   static Room fromDocumentSnapshot(
@@ -30,6 +60,20 @@ class Room {
         id: snapshot.id,
         name: snapshot.data()?["name"],
         userIds: ((snapshot.data()?["user_ids"] ?? []) as List).toListString());
+  }
+
+  static List<Room> fromQuerySnapshot(
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<Room> list = List.empty(growable: true);
+    for (var element in snapshot.docs) {
+      var data = element.data();
+      list.add(Room(
+        id: element.id,
+        name: data['name'] ?? '',
+        userIds: ((data['user_ids'] ?? []) as List).toListString(),
+      ));
+    }
+    return list;
   }
 }
 
@@ -43,36 +87,30 @@ class RoomCrud {
 
     List<User> users = [];
     List<DocumentReference> userDocs = [];
-    List<Future> tasks = [];
 
     for (String userId in userIds) {
       DocumentReference<Map<String, dynamic>> userDoc =
           _firestore.collection("user").doc(userId);
-      userDocs.add(userDoc);
 
-      tasks.add(
-          Isolate.spawn<DocumentReference<Map<String, dynamic>>>((doc) async {
-        User user = User.fromDocumentSnapshot(await doc.get());
-        user.roomIds.add(roomId);
-        users.add(user);
-        roomName += user.name + ", ";
-      }, userDoc));
+      User user = User.fromDocumentSnapshot(await userDoc.get());
+      user.roomIds.add(roomId);
+
+      userDocs.add(userDoc);
+      users.add(user);
     }
-    await Future.wait(tasks);
-    roomName = roomName.substring(0, roomName.length - 2);
+
+    roomName = users.map((e) => e.name).join(", ");
 
     Room room = Room(id: roomId, name: roomName, userIds: userIds);
 
-    _firestore.runTransaction((transaction) async {
-      transaction.update(roomDoc, room.toMap());
+    await _firestore.runTransaction((transaction) async {
+      // transaction.update(roomDoc, room.toMap());
+      transaction.set(roomDoc, room.toMap());
 
       for (int i = 0; i < users.length; i++) {
-        User user = users[i];
-        DocumentReference userDoc = userDocs[i];
-
-        transaction.update(userDoc, user.toMap());
+        transaction.update(userDocs[i], users[i].toMap());
       }
-    }, timeout: const Duration(seconds: 60));
+    }, timeout: const Duration(seconds: 5));
     return roomId;
   }
 
@@ -112,14 +150,19 @@ class RoomCrud {
     });
   }
 
-  Future<List<Room>> getRoomsOfUser(String userId) async {
+  Future<List<Room>> getRoomsOfUser(String userId, {String query = ""}) async {
     User user = await Get.find<UserCrud>().get(userId);
-    List<String> roomIds = user.roomIds;
 
-    return Future.wait(roomIds.map((id) async {
-      Room room = await get(id);
-      return room;
-    }).toList());
+    var queryBuilder = FirebaseFirestore.instance
+        .collection('room')
+        .where('user_ids', arrayContains: userId);
+    if (query != "") {
+      query = query.replaceAll(' ', '_');
+      queryBuilder = queryBuilder.where('name_search.$query', isEqualTo: true);
+    }
+
+    var results = Room.fromQuerySnapshot(await queryBuilder.get());
+    return results;
   }
 
   Future<Room> get(String roomId) async {

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';
@@ -22,13 +24,17 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
 
   final Map<String, int> roomMessagesLimit = {};
 
-  Future fetchMessages() async {
+  final searchContactController = TextEditingController();
+
+  final _debouncer = Debouncer(delay: Duration(milliseconds: 500));
+
+  Future fetchMessages({String query = ""}) async {
     rooms.clear();
     String userId = userCrud.currentUserId();
-    //Listen to changes in rooms list
+    // Listen to changes in rooms list
     _worker = ever(rooms, onRoomListChange);
     change(null, status: RxStatus.loading());
-    List<Room> roomList = await roomCrud.getRoomsOfUser(userId);
+    List<Room> roomList = await roomCrud.getRoomsOfUser(userId, query: query);
     roomList.forEach(addRoom);
 
     if (roomList.isEmpty) change(null, status: RxStatus.empty());
@@ -59,8 +65,33 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
 
   @override
   void onClose() {
+    searchContactController.dispose();
     _worker.dispose();
     super.onClose();
+  }
+
+  @override
+  void onInit() {
+    searchContactController.addListener(onSeachContactChange);
+    super.onInit();
+  }
+
+  void onSeachContactChange() {
+    _debouncer.call(() async {
+      var value = searchContactController.value.text.trim();
+      await fetchMessages(query: value);
+    });
+  }
+
+  String optimizeRoomName(String roomName, String username) {
+    print(roomName);
+    print(username);
+    var names = roomName.split(',').map((e) => e.trim());
+    List<String> nameList = names.toList();
+    if (names.length >= 2) {
+      nameList.remove(username);
+    }
+    return nameList.join(', ');
   }
 
   Future<void> sendMessage(Room room, String message,

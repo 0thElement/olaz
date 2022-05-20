@@ -24,7 +24,8 @@ class ContactScreen extends GetView<ChatController> {
     if (FirebaseAuth.instance.currentUser != null) controller.fetchMessages();
     return Scaffold(
         appBar: AppBar(
-          title: const TextField(
+          title: TextField(
+            controller: controller.searchContactController,
             cursorColor: Colors.white70,
             decoration: InputDecoration(
                 prefixIcon: Icon(

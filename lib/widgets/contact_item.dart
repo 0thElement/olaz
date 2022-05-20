@@ -25,7 +25,6 @@ class ContactItem extends StatelessWidget {
   Widget build(BuildContext context) {
     String latestPayload = "";
     String time = "";
-
     if (latestMessage != null) {
       DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
           latestMessage!.createdAt.millisecondsSinceEpoch);

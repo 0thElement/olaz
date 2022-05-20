@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/controllers/profile_controller.dart';
 import 'package:olaz/models/user.dart';
 import 'package:olaz/utils/extensions.dart';
 import 'package:olaz/widgets/icon_text.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends GetView<ProfileController> {
   const ProfileScreen({required this.user, Key? key}) : super(key: key);
 
   final User user;
-
-  void toggleAddToContact() {}
 
   Widget avatar() {
     if (user.profilePicture == "")
@@ -59,10 +59,15 @@ class ProfileScreen extends StatelessWidget {
             height: 20,
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: toggleAddToContact,
-                child: iconText("Add to contact", Icons.person_add,
-                    const TextStyle(color: Colors.white), Colors.white)),
+            child: controller.isFriend(user)
+                ? ElevatedButton(
+                    onPressed: null,
+                    child: iconText("Friend", Icons.person_outline,
+                        const TextStyle(color: Colors.white), Colors.white))
+                : ElevatedButton(
+                    onPressed: () => controller.addToContact(user.id),
+                    child: iconText("Add to contact", Icons.person_add,
+                        const TextStyle(color: Colors.white), Colors.white)),
           ),
           const SizedBox(
             height: 30,
