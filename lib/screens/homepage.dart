@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/user.dart' as olaz;
 import 'package:olaz/screens/chat/contact_list.dart';
-import 'package:olaz/screens/common/image_picker.dart';
+import 'package:olaz/screens/common/image_picker_screen.dart';
 import 'package:olaz/screens/social/wall.dart';
 import 'package:olaz/screens/profile/edit_profile.dart';
 
@@ -13,7 +13,7 @@ class HomePageController extends GetxController {
     const ContactScreen(),
     SocialWallScreen(),
     const EditProfileScreen(),
-    const UploadImage(),
+    const UploadImageScreen(),
   ];
   RxInt screenIndex = 0.obs;
   olaz.UserCrud userCrud = Get.find();
