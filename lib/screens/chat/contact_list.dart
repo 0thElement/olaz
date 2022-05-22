@@ -2,10 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/controllers/add_friend_controller.dart';
+import 'package:olaz/controllers/add_group_controller.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/screens/chat/add_friend.dart';
+import 'package:olaz/screens/chat/add_group.dart';
 import 'package:olaz/widgets/contact_item.dart';
 import 'package:olaz/widgets/popup_item.dart';
 
@@ -42,6 +44,11 @@ class ContactScreen extends GetView<ChatController> {
                     case 'friend':
                       Get.lazyPut(() => AddFriendController());
                       Get.to(() => const AddFriendScreen());
+                      break;
+                    case 'group':
+                      Get.lazyPut(() => AddGroupController());
+                      Get.to(() => const AddGroupScreen());
+                      break;
                   }
                 },
                 icon: const Icon(

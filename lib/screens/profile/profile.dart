@@ -30,13 +30,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future toggleAddToContact() async {
     User currentUser = await userCrud.currentUser();
     if (currentUser.friendIds.contains(widget.user.id)) {
-      print("remove");
       await userCrud.removeFriend(currentUser.id, widget.user.id);
       setState(() {
         isFriend = false;
       });
     } else {
-      print("add");
       await userCrud.addFriend(currentUser.id, widget.user.id);
       setState(() {
         isFriend = true;
