@@ -4,9 +4,7 @@ class MessageBar extends StatelessWidget {
   final String hint;
   final TextEditingController textEditingController;
   final VoidCallback onSend;
-  final VoidCallback onFocus;
-  const MessageBar(
-      this.hint, this.textEditingController, this.onSend, this.onFocus,
+  const MessageBar(this.hint, this.textEditingController, this.onSend,
       {Key? key})
       : super(key: key);
 
@@ -22,7 +20,6 @@ class MessageBar extends StatelessWidget {
           //Text field
           Expanded(
             child: TextField(
-              onTap: onFocus,
               controller: textEditingController,
               keyboardType: TextInputType.multiline,
               textAlignVertical: TextAlignVertical.center,

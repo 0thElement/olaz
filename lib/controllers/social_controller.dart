@@ -39,7 +39,7 @@ class SocialController extends GetxController with StateMixin<List<Message>> {
     _postsLimit = min(_postsLimit, posts.length);
   }
 
-  void loadMorePosts() async {
+  void loadMorePosts() {
     _postsLimit += _postsLimitIncrement;
     scrollController = ScrollController(initialScrollOffset: currentScroll);
     refreshPosts();

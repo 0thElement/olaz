@@ -85,7 +85,7 @@ class PostCrud {
         .collection("message")
         .doc(roomId)
         .collection(roomId)
-        .orderBy("created_at", descending: false)
+        .orderBy("created_at", descending: true)
         .limit(limit)
         .snapshots()
         .map((QuerySnapshot querySnapshot) => querySnapshot.docs

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';
@@ -17,10 +19,12 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
   final RxBool _sending = false.obs;
   bool get sending => _sending.value;
 
-  static const int initialLimit = 50;
-  static const int limitIncrement = 50;
-
+  static const int initialLimit = 20;
+  static const int limitIncrement = 20;
   final Map<String, int> roomMessagesLimit = {};
+
+  final Map<String, double> currentScroll = {};
+  final Map<String, ScrollController> scrollController = {};
 
   Future fetchMessages() async {
     rooms.clear();
@@ -36,9 +40,10 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
 
   void addRoom(Room room) async {
     messages[room.id] = <Message>[].obs;
+    roomMessagesLimit[room.id] = initialLimit;
+    scrollController[room.id] = ScrollController();
     messages[room.id]!
         .bindStream(messageCrud.roomMessageStream(room.id, initialLimit));
-    roomMessagesLimit[room.id] = initialLimit;
     room.name = '';
     for (String id in room.userIds) {
       if (id != userCrud.currentUserId()) {
@@ -50,8 +55,10 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
   }
 
   void loadMoreMessages(Room room) {
-    int newLimit = roomMessagesLimit[room.id] ?? 0 + limitIncrement;
+    int newLimit = (roomMessagesLimit[room.id] ?? 0) + limitIncrement;
     roomMessagesLimit[room.id] = newLimit;
+    scrollController[room.id] =
+        ScrollController(initialScrollOffset: currentScroll[room.id] ?? 0);
     messages[room.id]!
         .bindStream(messageCrud.roomMessageStream(room.id, newLimit));
   }

@@ -14,24 +14,12 @@ class CommentScreen extends GetView<CommentController> {
   final Message post;
 
   final TextEditingController messageTec = TextEditingController();
-  final ScrollController scrollController = ScrollController();
-
-  void scrollToBottom(int delay) {
-    Timer(Duration(milliseconds: delay), () {
-      if (scrollController.position.pixels <
-          scrollController.position.maxScrollExtent) {
-        scrollController.animateTo(scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-      }
-    });
-  }
 
   void onSend() {
     String content = messageTec.text;
     if (content.isEmpty) return;
     controller.sendComment(post.id, content);
     messageTec.clear();
-    scrollToBottom(350);
   }
 
   @override
@@ -63,6 +51,7 @@ class CommentScreen extends GetView<CommentController> {
                       }),
                     itemCount: state?.length ?? 0,
                     shrinkWrap: true,
+                    reverse: true,
                     itemBuilder: (context, index) {
                       DateTime durationAgo =
                           DateTime.fromMillisecondsSinceEpoch(
@@ -81,8 +70,7 @@ class CommentScreen extends GetView<CommentController> {
                 ),
                 onLoading: const Center(child: CircularProgressIndicator())),
           ),
-          MessageBar("Write a comment...", messageTec, onSend,
-              () => scrollToBottom(500))
+          MessageBar("Write a comment...", messageTec, onSend)
         ],
       ),
     );

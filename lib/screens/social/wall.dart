@@ -89,7 +89,7 @@ class SocialWallScreen extends GetView<SocialController> {
                     onLoading:
                         const Center(child: CircularProgressIndicator())),
               ),
-              MessageBar("Share your thought...", messageTec, onSend, () {})
+              MessageBar("Share your thought...", messageTec, onSend)
             ])));
   }
 }

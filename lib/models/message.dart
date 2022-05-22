@@ -52,7 +52,7 @@ class MessageCrud {
 
   Stream<List<Message>> roomMessageStream(String roomId, int limit) {
     return _roomCollectionOf(roomId)
-        .orderBy("created_at", descending: false)
+        .orderBy("created_at", descending: true)
         .limit(limit)
         .snapshots()
         .map((QuerySnapshot querySnapshot) => querySnapshot.docs
