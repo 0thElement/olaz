@@ -158,7 +158,6 @@ class UserCrud {
             isGreaterThanOrEqualTo: name, isLessThanOrEqualTo: name + '\uf8ff');
 
     List<User> list = User.fromQuerySnapshot(await userDoc.get());
-    print(list);
     // cache[user.id] = user;
     return list;
     // return null;

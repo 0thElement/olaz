@@ -22,9 +22,11 @@ class ConversationScreen extends StatelessWidget {
   void scrollToBottom(int delay) {
     Timer(Duration(milliseconds: delay), () {
       if (scrollController.position.pixels <
-          scrollController.position.maxScrollExtent) {
-        scrollController.animateTo(scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+          scrollController.position.maxScrollExtent + 100) {
+        scrollController.animateTo(
+            scrollController.position.maxScrollExtent + 100,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut);
       }
     });
   }

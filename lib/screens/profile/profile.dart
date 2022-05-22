@@ -30,13 +30,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future toggleAddToContact() async {
     User currentUser = await userCrud.currentUser();
     if (currentUser.friendIds.contains(widget.user.id)) {
-      print("remove");
       await userCrud.removeFriend(currentUser.id, widget.user.id);
       setState(() {
         isFriend = false;
       });
     } else {
-      print("add");
       await userCrud.addFriend(currentUser.id, widget.user.id);
       setState(() {
         isFriend = true;
@@ -47,6 +45,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget avatar() {
     return UserAvatar(widget.user.id, 80);
+  }
+
+  bool isSelf() {
+    return userCrud.currentUserId() == widget.user.id;
   }
 
   @override
@@ -88,15 +90,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 20,
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: toggleAddToContact,
-                style: ElevatedButton.styleFrom(
-                    primary: isFriend ? Colors.grey : Colors.lightBlue),
-                child: iconText(
-                    isFriend ? "Remove from contact" : "Add to contact",
-                    Icons.person_add,
-                    const TextStyle(color: Colors.white),
-                    Colors.white)),
+            child: isSelf()
+                ? const SizedBox()
+                : ElevatedButton(
+                    onPressed: toggleAddToContact,
+                    style: ElevatedButton.styleFrom(
+                        primary: isFriend ? Colors.grey : Colors.lightBlue),
+                    child: iconText(
+                        isFriend ? "Remove from contact" : "Add to contact",
+                        Icons.person_add,
+                        const TextStyle(color: Colors.white),
+                        Colors.white)),
           ),
           const SizedBox(
             height: 30,
