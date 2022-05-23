@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/controllers/comment_controller.dart';
+import 'package:olaz/models/message.dart';
 import 'package:olaz/screens/social/comments.dart';
 import 'package:olaz/widgets/icon_text.dart';
+import 'package:olaz/widgets/user_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import '../models/user.dart';
+
 class PostItem extends StatefulWidget {
-  final String user;
-  final String userAvatar;
-  final String content;
-  final String? image;
-  final DateTime created;
-  final DateTime edited;
-  final int commentCount;
-  const PostItem(this.user, this.userAvatar, this.content, this.created,
-      this.edited, this.commentCount,
-      {this.image, Key? key})
-      : super(key: key);
+  final Message post;
+  const PostItem(this.post, {Key? key}) : super(key: key);
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -25,29 +22,38 @@ class _PostItemState extends State<PostItem> {
   bool showAllContent = false;
   bool exceeded = false;
 
-  void moveToCommentScreen() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return CommentScreen();
-    }));
+  User sender = User.emptyUser;
+
+  @override
+  void initState() {
+    getSender();
+    super.initState();
   }
 
-  Widget userAvatar() => CircleAvatar(
-        backgroundImage: NetworkImage(widget.userAvatar),
-        maxRadius: 20,
-      );
+  Future getSender() async {
+    User user = await Get.find<UserCrud>().get(widget.post.sender);
+    setState(() {
+      sender = user;
+    });
+  }
+
+  void moveToCommentScreen() {
+    Get.replace(CommentController());
+    Get.to(CommentScreen(widget.post));
+  }
 
   Widget postInformation() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            widget.user,
+            sender.name,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           const SizedBox(
             height: 6,
           ),
           Text(
-            timeago.format(widget.created, locale: "en_short"),
+            timeago.format(widget.post.createdAt.toDate(), locale: "en_short"),
             style: TextStyle(
                 fontSize: 13,
                 color: Colors.grey.shade600,
@@ -57,30 +63,41 @@ class _PostItemState extends State<PostItem> {
       );
 
   Widget content() => LayoutBuilder(builder: (context, size) {
+        double leftPadding = 35;
+        double width = size.maxWidth - leftPadding;
         TextPainter tp = TextPainter(
             maxLines: maxLines,
             textAlign: TextAlign.left,
             textDirection: TextDirection.ltr,
-            text: TextSpan(text: widget.content));
+            text: TextSpan(text: widget.post.payload));
 
-        tp.layout(maxWidth: size.maxWidth);
+        tp.layout(maxWidth: width);
         exceeded = tp.didExceedMaxLines;
 
         Widget content = (exceeded && !showAllContent)
             ? ShaderMask(
-                child: Text(widget.content, maxLines: maxLines),
+                child: Text(widget.post.payload,
+                    textAlign: TextAlign.left, maxLines: maxLines),
                 shaderCallback: (bounds) => const LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [Colors.white, Colors.transparent])
                     .createShader(
                         Rect.fromLTWH(0, bounds.height - 20, bounds.width, 20)))
-            : Text(widget.content);
+            : Text(
+                widget.post.payload,
+                textAlign: TextAlign.left,
+              );
         if (exceeded) {
           content = Column(
             children: [content, toggleCollapseButton()],
           );
         }
+        content = Container(
+          width: width,
+          padding: EdgeInsets.only(left: leftPadding),
+          child: content,
+        );
         return content;
       });
 
@@ -109,11 +126,8 @@ class _PostItemState extends State<PostItem> {
                 moveToCommentScreen();
               });
             },
-            child: iconText(
-                "${widget.commentCount} comment${widget.commentCount > 1 ? "s" : ""}",
-                Icons.comment_rounded,
-                TextStyle(color: Colors.grey[700]),
-                Colors.grey[700]!)),
+            child: iconText("Comments", Icons.comment_rounded,
+                TextStyle(color: Colors.grey[700]), Colors.grey[700]!)),
       );
 
   @override
@@ -127,7 +141,11 @@ class _PostItemState extends State<PostItem> {
         children: [
           Row(
             children: [
-              userAvatar(),
+              UserAvatar(
+                sender.id,
+                20,
+                interactable: true,
+              ),
               const SizedBox(
                 width: 15,
               ),

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/controllers/add_friend_controller.dart';
+import 'package:olaz/controllers/social_controller.dart';
+import 'package:olaz/screens/chat/add_friend.dart';
 import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/popup_item.dart';
 import 'package:olaz/widgets/post_item.dart';
 
-class SocialWallScreen extends StatelessWidget {
+class SocialWallScreen extends GetView<SocialController> {
   SocialWallScreen({Key? key}) : super(key: key);
 
   final TextEditingController messageTec = TextEditingController();
@@ -13,6 +17,13 @@ class SocialWallScreen extends StatelessWidget {
       createPopupItem('Add a friend', 'friend', Icons.person_add_alt_rounded),
       createPopupItem('Create a group', 'group', Icons.group_add),
     ];
+  }
+
+  void onSend() {
+    String content = messageTec.text;
+    if (content.isEmpty) return;
+    controller.createPost(content);
+    messageTec.clear();
   }
 
   @override
@@ -32,6 +43,13 @@ class SocialWallScreen extends StatelessWidget {
           ),
           actions: [
             PopupMenuButton(
+                onSelected: (value) {
+                  switch (value) {
+                    case 'friend':
+                      Get.lazyPut(() => AddFriendController());
+                      Get.to(() => const AddFriendScreen());
+                  }
+                },
                 icon: const Icon(
                   Icons.add,
                   color: Colors.white70,
@@ -41,24 +59,37 @@ class SocialWallScreen extends StatelessWidget {
                 })
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: ListView.builder(
-                  itemCount: 1,
-                  shrinkWrap: true,
-                  itemBuilder: ((context, index) {
-                    return PostItem(
-                        "Username",
-                        "",
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-                        DateTime.utc(2022, 4, 11, 16, 20),
-                        DateTime.utc(2022, 4, 12, 3, 30),
-                        5);
-                  })),
-            ),
-            MessageBar("Share your thought...", messageTec, () {}, () {})
-          ],
-        ));
+        body: RefreshIndicator(
+            onRefresh: controller.refreshPosts,
+            child: Column(children: [
+              Expanded(
+                child: controller.obx((state) {
+                  return ListView.builder(
+                      controller: controller.scrollController
+                        ..addListener(() {
+                          double extent = controller
+                              .scrollController.position.maxScrollExtent;
+                          double current =
+                              controller.scrollController.position.pixels;
+                          controller.currentScroll = current;
+                          if (current >= extent) controller.loadMorePosts();
+                        }),
+                      itemCount: state?.length,
+                      shrinkWrap: true,
+                      itemBuilder: ((context, index) {
+                        return PostItem(state![index]);
+                      }));
+                },
+                    onEmpty: const Center(
+                      child: Text(
+                        "No posts on your wall. Add more people to your contact!",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ),
+                    onLoading:
+                        const Center(child: CircularProgressIndicator())),
+              ),
+              MessageBar("Share your thought...", messageTec, onSend)
+            ])));
   }
 }

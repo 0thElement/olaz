@@ -5,7 +5,7 @@ import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/user_avatar.dart';
 
 class MessageBubble extends StatelessWidget {
-  final String? userId;
+  final String userId;
   final bool wasSentBySelf;
   final String message;
   final bool isTopOfChain;
@@ -13,12 +13,10 @@ class MessageBubble extends StatelessWidget {
   final String time;
   const MessageBubble(this.message, this.wasSentBySelf, this.isTopOfChain,
       this.isBottomOfChain, this.time,
-      {this.userId, Key? key})
+      {required this.userId, Key? key})
       : super(key: key);
 
   static const Radius borderRadius = Radius.circular(20);
-
-  bool shouldRenderSender() => !wasSentBySelf && userId != null && isTopOfChain;
 
   Widget userAvatar() => UserAvatar(
         userId,
@@ -75,10 +73,10 @@ class MessageBubble extends StatelessWidget {
           top: isTopOfChain ? 10 : 2,
           bottom: isBottomOfChain ? 25 : 2,
         ),
-        child: shouldRenderSender()
+        child: !wasSentBySelf && isTopOfChain
             ? FutureBuilder<User>(
                 initialData: User.emptyUser,
-                future: Get.find<ChatController>().getUser(userId!),
+                future: Get.find<ChatController>().getUser(userId),
                 builder: (context, snapshot) => Stack(
                   children: [
                     Positioned(child: userAvatar(), left: 7, top: 0),
@@ -98,6 +96,14 @@ class MessageBubble extends StatelessWidget {
                   clipBehavior: Clip.none,
                 ),
               )
-            : bubble());
+            : isTopOfChain
+                ? Stack(children: [
+                    Positioned(
+                      child: username("You"),
+                      right: 0,
+                    ),
+                    Column(children: [const SizedBox(height: 20), bubble()]),
+                  ])
+                : bubble());
   }
 }

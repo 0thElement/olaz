@@ -47,6 +47,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return UserAvatar(widget.user.id, 80);
   }
 
+  bool isSelf() {
+    return userCrud.currentUserId() == widget.user.id;
+  }
+
   @override
   Widget build(BuildContext context) {
     String username = widget.user.name;
@@ -86,15 +90,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             height: 20,
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: toggleAddToContact,
-                style: ElevatedButton.styleFrom(
-                    primary: isFriend ? Colors.grey : Colors.lightBlue),
-                child: iconText(
-                    isFriend ? "Remove from contact" : "Add to contact",
-                    Icons.person_add,
-                    const TextStyle(color: Colors.white),
-                    Colors.white)),
+            child: isSelf()
+                ? const SizedBox()
+                : ElevatedButton(
+                    onPressed: toggleAddToContact,
+                    style: ElevatedButton.styleFrom(
+                        primary: isFriend ? Colors.grey : Colors.lightBlue),
+                    child: iconText(
+                        isFriend ? "Remove from contact" : "Add to contact",
+                        Icons.person_add,
+                        const TextStyle(color: Colors.white),
+                        Colors.white)),
           ),
           const SizedBox(
             height: 30,
