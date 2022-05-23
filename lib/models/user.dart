@@ -90,6 +90,19 @@ class UserCrud {
 
   String currentUserId() => FirebaseAuth.instance.currentUser?.uid ?? "";
 
+  Future<List<User>> getFriends(String id, {String name = ""}) async {
+    Query<Map<String, dynamic>> userDoc =
+        _firestore.collection("user").where('friends_id', arrayContains: id);
+    if (name != "") {
+      name = name.toUpperCase().replaceAll(' ', '_');
+      userDoc = userDoc.orderBy('name_searchable').where('name_searchable',
+          isGreaterThanOrEqualTo: name, isLessThanOrEqualTo: name + '\uf8ff');
+    }
+
+    List<User> list = User.fromQuerySnapshot(await userDoc.get());
+    return list;
+  }
+
   Future<void> addFriend(String userId, String friendId) async {
     DocumentReference userDoc = _firestore.collection("user").doc(userId);
     DocumentReference friendDoc = _firestore.collection("user").doc(friendId);
@@ -103,8 +116,7 @@ class UserCrud {
         ? "$userId - $friendId"
         : "$friendId - $userId";
     DocumentReference roomDoc = _firestore.collection("room").doc(roomId);
-    Room room =
-        Room(name: "${user.name}, ${friend.name}", userIds: [userId, friendId]);
+    Room room = Room(userIds: [userId, friendId]);
 
     if (!user.roomIds.contains(roomId)) user.roomIds.add(roomId);
     if (!friend.roomIds.contains(roomId)) friend.friendIds.add(roomId);

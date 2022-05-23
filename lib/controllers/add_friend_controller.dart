@@ -36,7 +36,6 @@ class AddFriendController extends GetxController with StateMixin<List<User>> {
         change(null, status: RxStatus.empty());
         return;
       }
-      // users.addAll(list);
       change(list, status: RxStatus.success());
     });
   }
