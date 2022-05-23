@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:olaz/controllers/add_friend_controller.dart';
-import 'package:olaz/widgets/user_item.dart';
+import 'package:olaz/widgets/user_item_2.dart';
 
 class AddFriendScreen extends GetView<AddFriendController> {
   const AddFriendScreen({Key? key}) : super(key: key);
@@ -13,7 +13,7 @@ class AddFriendScreen extends GetView<AddFriendController> {
           title: TextField(
             controller: controller.searchController,
             cursorColor: Colors.white70,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 prefixIcon: Icon(
                   Icons.search,
                   color: Colors.white70,
@@ -29,7 +29,7 @@ class AddFriendScreen extends GetView<AddFriendController> {
               shrinkWrap: true,
               itemBuilder: ((context, index) {
                 var user = users![index];
-                return UserSearchItem(user);
+                return UserSearchItem2(user);
               })),
           onEmpty: const Center(
             child: Text("No user found"),

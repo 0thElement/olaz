@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,22 +19,11 @@ class ConversationScreen extends StatelessWidget {
   final FocusNode messageFocus = FocusNode();
   final ScrollController scrollController = ScrollController();
 
-  void scrollToBottom(int delay) {
-    Timer(Duration(milliseconds: delay), () {
-      if (scrollController.position.pixels <
-          scrollController.position.maxScrollExtent) {
-        scrollController.animateTo(scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-      }
-    });
-  }
-
   void onSend() {
     String content = messageTec.text;
     if (content.isEmpty) return;
     controller.sendMessage(room, content);
     messageTec.clear();
-    scrollToBottom(350);
   }
 
   Widget avatar({double radius = 30}) {
@@ -44,7 +33,7 @@ class ConversationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    scrollToBottom(100);
+    controller.scrollController[room.id] = ScrollController();
     return Scaffold(
         appBar: customAppBar(context),
         body: GestureDetector(
@@ -60,14 +49,24 @@ class ConversationScreen extends StatelessWidget {
 
   Widget messageList(BuildContext context) => Obx(() {
         List<Message> messages = controller.messages[room.id]!;
+        controller.roomMessagesLimit[room.id] =
+            min(controller.roomMessagesLimit[room.id]!, messages.length);
         return ListView.builder(
-            controller: scrollController,
+            controller: controller.scrollController[room.id]!
+              ..addListener(() {
+                ScrollController scr = controller.scrollController[room.id]!;
+                double current = scr.position.pixels;
+                double extent = scr.position.maxScrollExtent;
+                controller.currentScroll[room.id] = current;
+                if (current >= extent) controller.loadMoreMessages(room);
+              }),
             itemCount: messages.length,
             shrinkWrap: true,
+            reverse: true,
             itemBuilder: (context, index) {
-              bool isBottomOfChain = index == messages.length - 1 ||
+              bool isTopOfChain = index == messages.length - 1 ||
                   messages[index + 1].sender != messages[index].sender;
-              bool isTopOfChain = index == 0 ||
+              bool isBottomOfChain = index == 0 ||
                   messages[index - 1].sender != messages[index].sender;
 
               DateTime durationAgo = DateTime.fromMillisecondsSinceEpoch(
@@ -84,8 +83,7 @@ class ConversationScreen extends StatelessWidget {
             });
       });
 
-  Widget sendMessageBar() => MessageBar(
-      "Write message...", messageTec, onSend, () => scrollToBottom(350));
+  Widget sendMessageBar() => MessageBar("Write message...", messageTec, onSend);
 
   AppBar customAppBar(BuildContext context) => AppBar(
         elevation: 0,
@@ -128,13 +126,41 @@ class ConversationScreen extends StatelessWidget {
                 ))),
       );
 
+  Widget name(String name, TextStyle style) =>
+      LayoutBuilder(builder: (context, size) {
+        TextPainter tp = TextPainter(
+            maxLines: 1,
+            textAlign: TextAlign.left,
+            textDirection: TextDirection.ltr,
+            text: TextSpan(text: name, style: style));
+
+        tp.layout(maxWidth: size.maxWidth);
+        bool exceeded = tp.didExceedMaxLines;
+
+        Widget content = exceeded
+            ? ShaderMask(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  style: style,
+                ),
+                shaderCallback: (bounds) => const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Colors.white, Colors.blue])
+                    .createShader(
+                        Rect.fromLTWH(bounds.width - 30, 0, 30, bounds.height)))
+            : Text(name, style: style);
+        return content;
+      });
+
   Column userInformation() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              room.name,
-              style: const TextStyle(
+            name(
+              room.displayName,
+              const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold),
@@ -144,15 +170,6 @@ class ConversationScreen extends StatelessWidget {
             ),
             Row(
               children: [
-                // Container(
-                //   width: 10,
-                //   height: 10,
-                //   decoration: const BoxDecoration(
-                //       color: Colors.green, shape: BoxShape.circle),
-                // ),
-                // const SizedBox(
-                //   width: 6,
-                // ),
                 Text(
                   "${room.userIds.length} members",
                   style: const TextStyle(color: Colors.white70),

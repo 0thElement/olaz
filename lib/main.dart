@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:olaz/controllers/add_friend_controller.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/controllers/login_controller.dart';
+import 'package:olaz/controllers/social_controller.dart';
 import 'package:olaz/models/post.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';
@@ -28,6 +29,7 @@ Future<void> main() async {
   Get.put(LoginController());
   Get.put(EditProfileScreenController());
   Get.put(HomePageController());
+  Get.put(SocialController());
   Get.put(AddFriendController(), tag: 'AddFriendController');
   runApp(const MyApp());
 }

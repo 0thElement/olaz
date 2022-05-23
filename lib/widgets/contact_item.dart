@@ -63,7 +63,7 @@ class ContactItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          room.name,
+                          room.displayName,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w500),
                         ),
@@ -71,7 +71,9 @@ class ContactItem extends StatelessWidget {
                           height: 6,
                         ),
                         Text(
-                          "$username: $latestPayload",
+                          latestMessage == null
+                              ? "No messages yet"
+                              : "$username: $latestPayload",
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,

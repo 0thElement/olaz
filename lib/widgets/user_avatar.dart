@@ -74,7 +74,7 @@ class GroupAvatar extends StatelessWidget {
     ids.remove(Get.find<UserCrud>().currentUserId());
 
     if (ids.length == 1) {
-      return UserAvatar(ids.first, radius);
+      return UserAvatar(ids.first, radius, interactable: true);
     } else if (ids.length == 2) {
       double r = radius / sqrt(2);
       return SizedBox(
@@ -82,8 +82,20 @@ class GroupAvatar extends StatelessWidget {
         height: radius * 2,
         child: Stack(
           children: [
-            Positioned(child: UserAvatar(ids.last, r), top: 0, right: 0),
-            Positioned(child: UserAvatar(ids.first, r), left: 0, bottom: 0),
+            Positioned(
+                child: UserAvatar(
+                  ids.last,
+                  r,
+                ),
+                top: 0,
+                right: 0),
+            Positioned(
+                child: UserAvatar(
+                  ids.first,
+                  r,
+                ),
+                left: 0,
+                bottom: 0),
           ],
           clipBehavior: Clip.none,
         ),
@@ -95,11 +107,35 @@ class GroupAvatar extends StatelessWidget {
         height: radius * 2,
         child: Stack(
           children: [
-            Positioned(child: UserAvatar(ids[0], r), left: 0, top: 0),
-            Positioned(child: UserAvatar(ids[1], r), right: 0, top: 0),
-            Positioned(child: UserAvatar(ids[2], r), left: 0, bottom: 0),
+            Positioned(
+                child: UserAvatar(
+                  ids[0],
+                  r,
+                ),
+                left: 0,
+                top: 0),
+            Positioned(
+                child: UserAvatar(
+                  ids[1],
+                  r,
+                ),
+                right: 0,
+                top: 0),
+            Positioned(
+                child: UserAvatar(
+                  ids[2],
+                  r,
+                ),
+                left: 0,
+                bottom: 0),
             ids.length >= 4
-                ? Positioned(child: UserAvatar(ids[3], r), left: 0, bottom: 0)
+                ? Positioned(
+                    child: UserAvatar(
+                      ids[3],
+                      r,
+                    ),
+                    right: 0,
+                    bottom: 0)
                 : const SizedBox(),
           ],
           clipBehavior: Clip.none,

@@ -5,9 +5,7 @@ class MessageBar extends StatefulWidget {
   final String hint;
   final TextEditingController textEditingController;
   final VoidCallback onSend;
-  final VoidCallback onFocus;
-  const MessageBar(
-      this.hint, this.textEditingController, this.onSend, this.onFocus,
+  const MessageBar(this.hint, this.textEditingController, this.onSend,
       {Key? key})
       : super(key: key);
 
