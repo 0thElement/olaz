@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:olaz/models/message.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';

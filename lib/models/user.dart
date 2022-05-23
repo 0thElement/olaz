@@ -119,7 +119,7 @@ class UserCrud {
     Room room = Room(userIds: [userId, friendId]);
 
     if (!user.roomIds.contains(roomId)) user.roomIds.add(roomId);
-    if (!friend.roomIds.contains(roomId)) friend.friendIds.add(roomId);
+    if (!friend.roomIds.contains(roomId)) friend.roomIds.add(roomId);
 
     await _firestore.runTransaction((transaction) async {
       transaction.update(friendDoc, friend.toMap());
@@ -143,7 +143,7 @@ class UserCrud {
     DocumentReference roomDoc = _firestore.collection("room").doc(roomId);
 
     if (user.roomIds.contains(roomId)) user.roomIds.remove(roomId);
-    if (friend.roomIds.contains(roomId)) friend.friendIds.remove(roomId);
+    if (friend.roomIds.contains(roomId)) friend.roomIds.remove(roomId);
 
     await _firestore.runTransaction((transaction) async {
       transaction.update(friendDoc, friend.toMap());
