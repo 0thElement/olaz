@@ -71,7 +71,7 @@ class _MessageBarState extends State<MessageBar> {
                   Row(children: [
                     IconButton(
                         onPressed: showImagePicker,
-                        icon: const Icon(Icons.add)),
+                        icon: const Icon(Icons.photo)),
                     //Text field
                     Expanded(
                       child: TextField(

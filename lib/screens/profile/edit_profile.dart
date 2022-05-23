@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:olaz/controllers/login_controller.dart';
 import 'package:olaz/models/user.dart';
+import 'package:olaz/services/storage.dart';
+import 'package:olaz/widgets/image_picker.dart';
 import 'package:olaz/widgets/user_avatar.dart';
 
 class EditProfileScreenController extends GetxController {
@@ -22,6 +27,10 @@ class EditProfileScreenController extends GetxController {
     user.value!.phoneNumber = phoneTec.text;
     user.value!.name = nameTec.text;
     user.value!.dateOfBirth = Timestamp.fromDate(selectedDateOfBirth.value);
+    if (selectedAvatar.value != null) {
+      String url = await StorageService.upload(selectedAvatar.value!.path);
+      user.value!.profilePicture = url;
+    }
     await Get.find<UserCrud>().save(user.value!.id, user.value!);
     if (isNewUser) Get.offAllNamed('/home');
 
@@ -47,6 +56,17 @@ class EditProfileScreenController extends GetxController {
     phoneTec.text = user.value!.phoneNumber;
     bioTec.text = user.value!.bio;
   }
+
+  Rxn<XFile> selectedAvatar = Rxn<XFile>();
+
+  void onSelectedAvatarChange(List<XFile> files) {
+    if (files.isEmpty) return;
+    selectedAvatar(files[0]);
+  }
+
+  void cancelAvatarChange() {
+    selectedAvatar(null);
+  }
 }
 
 class EditProfileScreen extends GetView<EditProfileScreenController> {
@@ -67,7 +87,24 @@ class EditProfileScreen extends GetView<EditProfileScreenController> {
     return timestamp.toDate();
   }
 
-  void uploadAvatar() {}
+  void uploadAvatar() {
+    Get.defaultDialog(
+        title: "Select avatar",
+        cancel: OutlinedButton(
+            onPressed: () {
+              controller.cancelAvatarChange();
+              Get.back();
+            },
+            child: const Text("Cancel")),
+        confirm: ElevatedButton(
+            onPressed: Get.back,
+            child:
+                const Text("Confirm", style: TextStyle(color: Colors.white))),
+        content: Container(
+          child: UploadImage(500,
+              onChange: controller.onSelectedAvatarChange, single: true),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +175,18 @@ class EditProfileScreen extends GetView<EditProfileScreenController> {
             children: [
               GestureDetector(
                   onTap: uploadAvatar,
-                  child: Obx(() => UserAvatar(controller.user.value?.id, 50))),
+                  child: Obx(() => controller.selectedAvatar.value == null
+                      ? UserAvatar(controller.user.value?.id, 50)
+                      : CircleAvatar(
+                          radius: 50,
+                          child: ClipOval(
+                            child: Image.file(
+                              File(controller.selectedAvatar.value!.path),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.fill,
+                            ),
+                          )))),
               TextButton(
                   onPressed: uploadAvatar,
                   child: const Text("Upload an avatar"))

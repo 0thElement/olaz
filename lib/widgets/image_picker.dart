@@ -55,79 +55,82 @@ class _UploadImageState extends State<UploadImage> {
   @override
   Widget build(BuildContext context) {
     double availableWidth = MediaQuery.of(context).size.width;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-              child: Container(
-            padding: const EdgeInsets.all(5),
-            width: availableWidth,
-            height: widget.maxHeight - 50,
-            child: Center(
-              child: imageList.isEmpty
-                  ? const Text(
-                      "No Image Selected",
-                      style: TextStyle(color: Colors.grey),
-                    )
-                  : (Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: widget.single
-                          ? Image.file(File(imageList[0].path))
-                          : GridView.builder(
-                              itemCount: imageList.length,
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3),
-                              itemBuilder: (BuildContext context, int index) {
-                                return GestureDetector(
-                                  onTap: () => setState(() {
-                                    imageList.removeAt(index);
-                                  }),
-                                  child: Image.file(
-                                    File(imageList[index].path),
-                                    fit: BoxFit.cover,
-                                  ),
-                                );
-                              },
-                            ),
-                    )),
-            ),
-          )),
-        ),
-        SizedBox(
-          height: 50,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: availableWidth / 3,
-                child: ElevatedButton(
-                  onPressed: getImageFromCamera,
-                  // tooltip: 'Choose Image From Camera',
-                  child: const Icon(
-                    Icons.camera,
-                    color: Colors.white,
-                  ),
-                ),
+    return SizedBox(
+      height: widget.maxHeight,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+                child: Container(
+              padding: const EdgeInsets.all(5),
+              width: availableWidth,
+              height: widget.maxHeight - 50,
+              child: Center(
+                child: imageList.isEmpty
+                    ? const Text(
+                        "No Image Selected",
+                        style: TextStyle(color: Colors.grey),
+                      )
+                    : (Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: widget.single
+                            ? Image.file(File(imageList[0].path))
+                            : GridView.builder(
+                                itemCount: imageList.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return GestureDetector(
+                                    onTap: () => setState(() {
+                                      imageList.removeAt(index);
+                                    }),
+                                    child: Image.file(
+                                      File(imageList[index].path),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                },
+                              ),
+                      )),
               ),
-              const SizedBox(
-                width: 20,
-              ),
-              SizedBox(
+            )),
+          ),
+          SizedBox(
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
                   width: availableWidth / 3,
                   child: ElevatedButton(
-                    onPressed: getImageFromGallery,
-                    // tooltip: 'Choose Image From Galerry',
+                    onPressed: getImageFromCamera,
+                    // tooltip: 'Choose Image From Camera',
                     child: const Icon(
-                      Icons.folder,
+                      Icons.camera,
                       color: Colors.white,
                     ),
-                  )),
-            ],
-          ),
-        )
-      ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 20,
+                ),
+                SizedBox(
+                    width: availableWidth / 3,
+                    child: ElevatedButton(
+                      onPressed: getImageFromGallery,
+                      // tooltip: 'Choose Image From Galerry',
+                      child: const Icon(
+                        Icons.folder,
+                        color: Colors.white,
+                      ),
+                    )),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
