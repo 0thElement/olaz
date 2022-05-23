@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:olaz/services/storage.dart';
 import 'package:olaz/widgets/image_picker.dart';
 
 class MessageBar extends StatefulWidget {
   final String hint;
   final TextEditingController textEditingController;
-  final VoidCallback onSend;
+  final Function(String message, List<String>? files) onSend;
   const MessageBar(this.hint, this.textEditingController, this.onSend,
       {Key? key})
       : super(key: key);
@@ -15,11 +17,38 @@ class MessageBar extends StatefulWidget {
 
 class _MessageBarState extends State<MessageBar> {
   bool shouldShowImagePicker = false;
+  List<XFile>? selectedFiles;
+
+  @override
+  void initState() {
+    shouldShowImagePicker = false;
+    super.initState();
+  }
 
   void showImagePicker() {
     setState(() {
       shouldShowImagePicker = !shouldShowImagePicker;
     });
+  }
+
+  void onSend() async {
+    if (selectedFiles == null || selectedFiles!.isEmpty) {
+      widget.onSend.call(widget.textEditingController.text, null);
+      return;
+    }
+
+    List<String> uploaded = await StorageService.uploadAll(
+        selectedFiles!.map((e) => e.path).toList());
+    widget.onSend.call(widget.textEditingController.text, uploaded);
+
+    setState(() {
+      shouldShowImagePicker = false;
+      selectedFiles = null;
+    });
+  }
+
+  void onSelectedFilesChange(List<XFile> files) {
+    selectedFiles = files;
   }
 
   @override
@@ -30,10 +59,13 @@ class _MessageBarState extends State<MessageBar> {
           curve: Curves.easeOut,
           duration: const Duration(milliseconds: 200),
           child: Container(
-            constraints: BoxConstraints(
-                minHeight: 50, maxHeight: shouldShowImagePicker ? 50 : 200),
+            constraints: const BoxConstraints(minHeight: 50),
+            decoration: const BoxDecoration(
+                border: Border(
+                    top: BorderSide(color: Colors.grey, width: 0.2),
+                    bottom: BorderSide(color: Colors.grey, width: 0.2))),
             child: Align(
-              alignment: Alignment.topLeft,
+              alignment: Alignment.bottomLeft,
               child: Column(
                 children: [
                   Row(children: [
@@ -43,7 +75,6 @@ class _MessageBarState extends State<MessageBar> {
                     //Text field
                     Expanded(
                       child: TextField(
-                        onTap: widget.onFocus,
                         controller: widget.textEditingController,
                         keyboardType: TextInputType.multiline,
                         textAlignVertical: TextAlignVertical.center,
@@ -56,14 +87,17 @@ class _MessageBarState extends State<MessageBar> {
                     ),
                     //Send Button
                     IconButton(
-                        onPressed: widget.onSend,
+                        onPressed: onSend,
                         icon: const Icon(Icons.send, color: Colors.lightBlue))
                   ]),
                   shouldShowImagePicker
-                      ? const SizedBox(
+                      ? SizedBox(
+                          height: 150,
+                          child:
+                              UploadImage(150, onChange: onSelectedFilesChange))
+                      : const SizedBox(
                           height: 0,
                         )
-                      : const SizedBox(height: 150, child: UploadImage(150))
                 ],
               ),
             ),

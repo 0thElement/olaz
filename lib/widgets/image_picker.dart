@@ -3,9 +3,13 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class UploadImage extends StatefulWidget {
-  const UploadImage(this.maxHeight, {Key? key}) : super(key: key);
+  const UploadImage(this.maxHeight,
+      {this.single = false, this.onChange, Key? key})
+      : super(key: key);
 
   final double maxHeight;
+  final bool single;
+  final Function(List<XFile>)? onChange;
 
   @override
   State<UploadImage> createState() => _UploadImageState();
@@ -14,13 +18,23 @@ class UploadImage extends StatefulWidget {
 class _UploadImageState extends State<UploadImage> {
   List<XFile> imageList = [];
   Future getImageFromGallery() async {
-    final images = await ImagePicker().pickMultiImage();
-
-    setState(() {
-      if (images != null) {
-        imageList.addAll(images);
-      }
-    });
+    if (!widget.single) {
+      final images = await ImagePicker().pickMultiImage();
+      setState(() {
+        if (images != null) {
+          imageList.addAll(images);
+        }
+        widget.onChange?.call(imageList);
+      });
+    } else {
+      XFile? image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      setState(() {
+        if (image != null) {
+          imageList = [image];
+        }
+        widget.onChange?.call(imageList);
+      });
+    }
   }
 
   Future getImageFromCamera() async {
@@ -28,7 +42,12 @@ class _UploadImageState extends State<UploadImage> {
 
     setState(() {
       if (image != null) {
-        imageList.add(image);
+        if (!widget.single) {
+          imageList.add(image);
+        } else {
+          imageList = [image];
+        }
+        widget.onChange?.call(imageList);
       }
     });
   }
@@ -53,23 +72,25 @@ class _UploadImageState extends State<UploadImage> {
                     )
                   : (Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                        itemCount: imageList.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 3),
-                        itemBuilder: (BuildContext context, int index) {
-                          return GestureDetector(
-                            onTap: () => setState(() {
-                              imageList.removeAt(index);
-                            }),
-                            child: Image.file(
-                              File(imageList[index].path),
-                              fit: BoxFit.cover,
+                      child: widget.single
+                          ? Image.file(File(imageList[0].path))
+                          : GridView.builder(
+                              itemCount: imageList.length,
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 3),
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () => setState(() {
+                                    imageList.removeAt(index);
+                                  }),
+                                  child: Image.file(
+                                    File(imageList[index].path),
+                                    fit: BoxFit.cover,
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
                     )),
             ),
           )),

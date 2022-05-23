@@ -19,10 +19,9 @@ class ConversationScreen extends StatelessWidget {
   final FocusNode messageFocus = FocusNode();
   final ScrollController scrollController = ScrollController();
 
-  void onSend() {
-    String content = messageTec.text;
-    if (content.isEmpty) return;
-    controller.sendMessage(room, content);
+  void onSend(String content, List<String>? files) {
+    if (content.isEmpty && (files == null || files.isEmpty)) return;
+    controller.sendMessage(room, content, files: files);
     messageTec.clear();
   }
 
@@ -74,12 +73,14 @@ class ConversationScreen extends StatelessWidget {
               String time = timeago.format(durationAgo, locale: 'en_short');
 
               return MessageBubble(
-                  messages[index].payload,
-                  messages[index].wasSentBySelf,
-                  isTopOfChain,
-                  isBottomOfChain,
-                  time,
-                  userId: messages[index].sender);
+                messages[index].payload,
+                messages[index].wasSentBySelf,
+                isTopOfChain,
+                isBottomOfChain,
+                time,
+                userId: messages[index].sender,
+                files: messages[index].files,
+              );
             });
       });
 

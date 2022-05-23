@@ -13,7 +13,7 @@ class MessageBubble extends StatelessWidget {
   final bool isTopOfChain;
   final bool isBottomOfChain;
   final String time;
-  final List<String> files;
+  final List<String>? files;
   const MessageBubble(this.message, this.wasSentBySelf, this.isTopOfChain,
       this.isBottomOfChain, this.time,
       {required this.userId, this.files = const [], Key? key})
@@ -65,26 +65,28 @@ class MessageBubble extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: files.isEmpty
+                    child: files == null || files!.isEmpty
                         ? Text(message, style: textStyle())
                         : Column(children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    message,
-                                    style: textStyle(),
-                                    textAlign: wasSentBySelf
-                                        ? TextAlign.right
-                                        : TextAlign.left,
+                            message == ""
+                                ? const SizedBox()
+                                : Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          message,
+                                          style: textStyle(),
+                                          textAlign: wasSentBySelf
+                                              ? TextAlign.right
+                                              : TextAlign.left,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                             const SizedBox(
-                              height: 10,
+                              height: 5,
                             ),
-                            filesView(files)
+                            filesView(files!)
                           ]),
                   )))
         ],

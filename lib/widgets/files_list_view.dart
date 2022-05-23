@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:olaz/screens/common/full_photo.dart';
 
-void toPhotoScreen(String url) {}
+void toPhotoScreen(String url) {
+  Get.to(FullPhotoPage(url: url));
+}
 
 Widget filesView(List<String> files, {double height = 75}) {
   if (files.length == 1) {

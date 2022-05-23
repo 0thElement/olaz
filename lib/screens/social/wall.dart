@@ -7,6 +7,9 @@ import 'package:olaz/widgets/message_bar.dart';
 import 'package:olaz/widgets/popup_item.dart';
 import 'package:olaz/widgets/post_item.dart';
 
+import '../../controllers/add_group_controller.dart';
+import '../chat/add_group.dart';
+
 class SocialWallScreen extends GetView<SocialController> {
   SocialWallScreen({Key? key}) : super(key: key);
 
@@ -19,10 +22,9 @@ class SocialWallScreen extends GetView<SocialController> {
     ];
   }
 
-  void onSend() {
-    String content = messageTec.text;
-    if (content.isEmpty) return;
-    controller.createPost(content);
+  void onSend(String content, List<String>? files) {
+    if (content.isEmpty && (files == null || files.isEmpty)) return;
+    controller.createPost(content, files: files);
     messageTec.clear();
   }
 
@@ -48,6 +50,11 @@ class SocialWallScreen extends GetView<SocialController> {
                     case 'friend':
                       Get.lazyPut(() => AddFriendController());
                       Get.to(() => const AddFriendScreen());
+                      break;
+                    case 'group':
+                      Get.lazyPut(() => AddGroupController());
+                      Get.to(() => const AddGroupScreen());
+                      break;
                   }
                 },
                 icon: const Icon(

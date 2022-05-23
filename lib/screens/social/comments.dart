@@ -13,10 +13,9 @@ class CommentScreen extends GetView<CommentController> {
 
   final TextEditingController messageTec = TextEditingController();
 
-  void onSend() {
-    String content = messageTec.text;
-    if (content.isEmpty) return;
-    controller.sendComment(post.id, content);
+  void onSend(String content, List<String>? files) {
+    if (content.isEmpty && (files == null || files.isEmpty)) return;
+    controller.sendComment(post.id, content, files: files);
     messageTec.clear();
   }
 
@@ -58,7 +57,8 @@ class CommentScreen extends GetView<CommentController> {
                           timeago.format(durationAgo, locale: 'en_short');
                       return MessageBubble(state[index].payload,
                           state[index].wasSentBySelf, true, true, time,
-                          userId: state[index].sender);
+                          userId: state[index].sender,
+                          files: state[index].files);
                     }),
                 onEmpty: const Center(
                   child: Text(
