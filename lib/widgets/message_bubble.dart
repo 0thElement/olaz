@@ -4,6 +4,8 @@ import 'package:olaz/models/user.dart';
 import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/widgets/user_avatar.dart';
 
+import 'files_list_view.dart';
+
 class MessageBubble extends StatelessWidget {
   final String userId;
   final bool wasSentBySelf;
@@ -11,9 +13,10 @@ class MessageBubble extends StatelessWidget {
   final bool isTopOfChain;
   final bool isBottomOfChain;
   final String time;
+  final List<String> files;
   const MessageBubble(this.message, this.wasSentBySelf, this.isTopOfChain,
       this.isBottomOfChain, this.time,
-      {required this.userId, Key? key})
+      {required this.userId, this.files = const [], Key? key})
       : super(key: key);
 
   static const Radius borderRadius = Radius.circular(20);
@@ -49,20 +52,43 @@ class MessageBubble extends StatelessWidget {
   Color backgroundColor() =>
       wasSentBySelf ? Colors.lightBlueAccent : Colors.grey[350]!;
 
-  Widget bubble() => Container(
-      padding: EdgeInsets.only(left: wasSentBySelf ? 0 : 54),
-      alignment: wasSentBySelf ? Alignment.topRight : Alignment.topLeft,
-      child: Container(
-          constraints: const BoxConstraints(maxWidth: 250),
-          decoration: BoxDecoration(
-            borderRadius: bubbleBorder(),
-            color: backgroundColor(),
-          ),
-          padding: const EdgeInsets.all(10),
-          child: Text(
-            message,
-            style: textStyle(),
-          )));
+  Widget bubble() => Column(
+        children: [
+          Container(
+              padding: EdgeInsets.only(left: wasSentBySelf ? 0 : 54),
+              alignment: wasSentBySelf ? Alignment.topRight : Alignment.topLeft,
+              child: Container(
+                  constraints: const BoxConstraints(maxWidth: 250),
+                  decoration: BoxDecoration(
+                    borderRadius: bubbleBorder(),
+                    color: backgroundColor(),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: files.isEmpty
+                        ? Text(message, style: textStyle())
+                        : Column(children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    message,
+                                    style: textStyle(),
+                                    textAlign: wasSentBySelf
+                                        ? TextAlign.right
+                                        : TextAlign.left,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            filesView(files)
+                          ]),
+                  )))
+        ],
+      );
 
   @override
   Widget build(BuildContext context) {

@@ -60,7 +60,10 @@ class SocialWallScreen extends GetView<SocialController> {
           ],
         ),
         body: RefreshIndicator(
-            onRefresh: controller.refreshPosts,
+            onRefresh: () async {
+              controller.scrollController = ScrollController();
+              controller.refreshPosts();
+            },
             child: Column(children: [
               Expanded(
                 child: controller.obx((state) {

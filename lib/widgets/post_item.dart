@@ -8,6 +8,7 @@ import 'package:olaz/widgets/user_avatar.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../models/user.dart';
+import 'files_list_view.dart';
 
 class PostItem extends StatefulWidget {
   final Message post;
@@ -32,9 +33,11 @@ class _PostItemState extends State<PostItem> {
 
   Future getSender() async {
     User user = await Get.find<UserCrud>().get(widget.post.sender);
-    setState(() {
-      sender = user;
-    });
+    if (mounted) {
+      setState(() {
+        sender = user;
+      });
+    }
   }
 
   void moveToCommentScreen() {
@@ -156,6 +159,12 @@ class _PostItemState extends State<PostItem> {
             height: 8,
           ),
           content(),
+          const SizedBox(
+            height: 15,
+          ),
+          widget.post.files?.isNotEmpty ?? false
+              ? filesView(widget.post.files!)
+              : const SizedBox(),
           const SizedBox(
             height: 15,
           ),
