@@ -37,6 +37,8 @@ class _MessageBarState extends State<MessageBar> {
       return;
     }
 
+    print(selectedFiles!.map((e) => e.path).toList());
+
     List<String> uploaded = await StorageService.uploadAll(
         selectedFiles!.map((e) => e.path).toList());
     widget.onSend.call(widget.textEditingController.text, uploaded);

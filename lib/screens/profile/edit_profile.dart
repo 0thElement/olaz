@@ -34,6 +34,8 @@ class EditProfileScreenController extends GetxController {
     await Get.find<UserCrud>().save(user.value!.id, user.value!);
     if (isNewUser) Get.offAllNamed('/home');
 
+    selectedAvatar.value = null;
+
     Get.snackbar('Successful', 'Your profile was updated');
   }
 

@@ -8,7 +8,8 @@ class StorageService {
   static final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   static Future<String> upload(String path) async {
-    Reference ref = _firebaseStorage.ref(_firebaseAuth.currentUser!.uid);
+    Reference ref =
+        _firebaseStorage.ref(_firebaseAuth.currentUser!.uid + "." + path);
 
     File file = File(path);
 
