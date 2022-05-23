@@ -39,13 +39,17 @@ class ChatController extends GetxController with StateMixin<List<Room>> {
     messages[room.id]!
         .bindStream(messageCrud.roomMessageStream(room.id, initialLimit));
     roomMessagesLimit[room.id] = initialLimit;
-    room.name = '';
-    for (String id in room.userIds) {
-      if (id != userCrud.currentUserId()) {
-        room.name += (await userCrud.getCached(id)).name + ", ";
+    if (room.name == null) {
+      String name = '';
+      for (String id in room.userIds) {
+        if (id != userCrud.currentUserId()) {
+          name += (await userCrud.getCached(id)).name + ", ";
+        }
       }
+      room.displayName = name.substring(0, name.length - 2);
+    } else {
+      room.displayName = room.name!;
     }
-    room.name = room.name.substring(0, room.name.length - 2);
     rooms.add(room);
   }
 
