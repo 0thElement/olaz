@@ -32,13 +32,10 @@ class AddFriendController extends GetxController with StateMixin<List<User>> {
       }
       change(null, status: RxStatus.loading());
       var list = await userCrud.search(searchController.value.text);
-      print(value);
-      print(list);
       if (list.isEmpty) {
         change(null, status: RxStatus.empty());
         return;
       }
-      // users.addAll(list);
       change(list, status: RxStatus.success());
     });
   }

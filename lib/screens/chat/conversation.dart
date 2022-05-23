@@ -128,13 +128,41 @@ class ConversationScreen extends StatelessWidget {
                 ))),
       );
 
+  Widget name(String name, TextStyle style) =>
+      LayoutBuilder(builder: (context, size) {
+        TextPainter tp = TextPainter(
+            maxLines: 1,
+            textAlign: TextAlign.left,
+            textDirection: TextDirection.ltr,
+            text: TextSpan(text: name, style: style));
+
+        tp.layout(maxWidth: size.maxWidth);
+        bool exceeded = tp.didExceedMaxLines;
+
+        Widget content = exceeded
+            ? ShaderMask(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  style: style,
+                ),
+                shaderCallback: (bounds) => const LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [Colors.white, Colors.blue])
+                    .createShader(
+                        Rect.fromLTWH(bounds.width - 30, 0, 30, bounds.height)))
+            : Text(name, style: style);
+        return content;
+      });
+
   Column userInformation() => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              room.name,
-              style: const TextStyle(
+            name(
+              room.displayName,
+              const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.bold),

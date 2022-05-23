@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_view.dart';
 import 'package:olaz/widgets/user_item_2.dart';
 
 import '../../controllers/add_group_controller.dart';
@@ -15,21 +14,26 @@ class AddGroupScreen extends GetView<AddGroupController> {
           actions: [
             Obx(() {
               if (controller.shouldAddGroup()) {
-                return ElevatedButton(
+                return IconButton(
                     onPressed: () {
                       Get.defaultDialog(
                           title: "New group chat",
                           confirm: ElevatedButton(
                               onPressed: controller.onGroupNameConfirm,
-                              child: Text("Confirm")),
-                          content: TextField(
-                            decoration: InputDecoration(
-                              hintText: "Enter group name or blank",
+                              child: const Text("Confirm",
+                                  style: TextStyle(color: Colors.white))),
+                          content: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: TextField(
+                              decoration: const InputDecoration(
+                                hintText:
+                                    "Enter group name. You can leave this blank",
+                              ),
+                              controller: controller.groupNameController,
                             ),
-                            controller: controller.groupNameController,
                           ));
                     },
-                    child: Icon(
+                    icon: const Icon(
                       Icons.add,
                       color: Colors.white70,
                     ));

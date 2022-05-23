@@ -63,7 +63,7 @@ class ContactItem extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          room.name,
+                          room.displayName,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.w500),
                         ),

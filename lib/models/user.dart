@@ -116,8 +116,7 @@ class UserCrud {
         ? "$userId - $friendId"
         : "$friendId - $userId";
     DocumentReference roomDoc = _firestore.collection("room").doc(roomId);
-    Room room =
-        Room(name: "${user.name}, ${friend.name}", userIds: [userId, friendId]);
+    Room room = Room(userIds: [userId, friendId]);
 
     if (!user.roomIds.contains(roomId)) user.roomIds.add(roomId);
     if (!friend.roomIds.contains(roomId)) friend.friendIds.add(roomId);

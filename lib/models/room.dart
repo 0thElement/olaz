@@ -1,5 +1,3 @@
-import 'dart:isolate';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:olaz/models/message.dart';
@@ -8,18 +6,20 @@ import 'user.dart';
 
 class Room {
   String id = '';
-  String name;
+  String? name;
   List<String> userIds = [];
+
+  String displayName = 'Unnamed group';
 
   Room({
     this.id = '',
-    this.name = '',
+    this.name,
     this.userIds = const [],
   });
 
   Map<String, dynamic> toMap() {
     return {
-      // "name": name,
+      "name": name,
       "user_ids": userIds,
     };
   }
@@ -28,7 +28,7 @@ class Room {
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Room(
         id: snapshot.id,
-        // name: snapshot.data()?["name"],
+        name: snapshot.data()?["name"],
         userIds: ((snapshot.data()?["user_ids"] ?? []) as List).toListString());
   }
 }
@@ -36,41 +36,36 @@ class Room {
 class RoomCrud {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String> createRoom(List<String> userIds) async {
+  Future<String> createRoom(List<String> userIds, {String? name}) async {
+    if (name != null && name.isEmpty) {
+      name = null;
+    }
     DocumentReference roomDoc = _firestore.collection("room").doc();
     String roomId = roomDoc.id;
-    String roomName = "";
 
     List<User> users = [];
     List<DocumentReference> userDocs = [];
-    List<Future> tasks = [];
 
     for (String userId in userIds) {
       DocumentReference<Map<String, dynamic>> userDoc =
           _firestore.collection("user").doc(userId);
       userDocs.add(userDoc);
 
-      tasks.add(
-          Isolate.spawn<DocumentReference<Map<String, dynamic>>>((doc) async {
-        User user = User.fromDocumentSnapshot(await doc.get());
-        user.roomIds.add(roomId);
-        users.add(user);
-        roomName += user.name + ", ";
-      }, userDoc));
+      User user = User.fromDocumentSnapshot(await userDoc.get());
+      user.roomIds.add(roomId);
+      users.add(user);
     }
-    await Future.wait(tasks);
-    roomName = roomName.substring(0, roomName.length - 2);
 
-    Room room = Room(id: roomId, name: roomName, userIds: userIds);
+    Room room = Room(id: roomId, name: name, userIds: userIds);
 
     await _firestore.runTransaction((transaction) async {
-      transaction.update(roomDoc, room.toMap());
+      transaction.set(roomDoc, room.toMap());
 
       for (int i = 0; i < users.length; i++) {
         User user = users[i];
         DocumentReference userDoc = userDocs[i];
 
-        transaction.update(userDoc, user.toMap());
+        transaction.set(userDoc, user.toMap());
       }
     }, timeout: const Duration(seconds: 60));
     return roomId;

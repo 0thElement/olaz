@@ -134,7 +134,7 @@ class GroupAvatar extends StatelessWidget {
                       ids[3],
                       r,
                     ),
-                    left: 0,
+                    right: 0,
                     bottom: 0)
                 : const SizedBox(),
           ],

@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart' as FBAuth;
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_workers/utils/debouncer.dart';
+import 'package:olaz/controllers/chat_controller.dart';
 import 'package:olaz/models/room.dart';
 import 'package:olaz/models/user.dart';
 
@@ -11,7 +12,7 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
 
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 500));
 
-  RxMap<String, User> checked_users = Map<String, User>.identity().obs;
+  RxMap<String, User> checkedUsers = Map<String, User>.identity().obs;
 
   late String? uid;
   UserCrud userCrud = Get.find();
@@ -19,7 +20,7 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
 
   @override
   void onInit() {
-    uid = FBAuth.FirebaseAuth.instance.currentUser?.uid;
+    uid = auth.FirebaseAuth.instance.currentUser?.uid;
     searchController.clear();
     groupNameController.clear();
     searchController.addListener(onSearchChange);
@@ -38,7 +39,7 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
   }
 
   bool isCheck(User user) {
-    if (checked_users[user.id] == null) {
+    if (checkedUsers[user.id] == null) {
       return false;
     }
     return true;
@@ -46,9 +47,9 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
 
   void onCheck(User user, bool value) {
     if (value) {
-      checked_users[user.id] = user;
+      checkedUsers[user.id] = user;
     } else {
-      checked_users.remove(user.id);
+      checkedUsers.remove(user.id);
     }
   }
 
@@ -65,22 +66,24 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
   }
 
   void onGroupNameConfirm() async {
-    var value = searchController.value.text;
+    var value = groupNameController.value.text;
     List<String> list = List<String>.empty(growable: true);
-    checked_users.forEach((key, value) {
+    checkedUsers.forEach((key, value) {
       list.add(key);
     });
     list.add(uid!);
     await roomCrud.createRoom(list, name: value);
+    Get.find<ChatController>().fetchMessages();
+    Get.back(closeOverlays: true);
   }
 
   bool shouldAddGroup() {
-    return checked_users.isNotEmpty;
+    return checkedUsers.isNotEmpty;
   }
 
   void onAddGroupClick() async {
     List<String> list = List<String>.empty(growable: true);
-    checked_users.forEach((key, value) {
+    checkedUsers.forEach((key, value) {
       list.add(key);
     });
     await roomCrud.createRoom(list);
@@ -88,11 +91,11 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
 
   List<User> mergeListUser(List<User> users) {
     List<User> ret = List<User>.empty(growable: true);
-    checked_users.forEach((key, value) {
+    checkedUsers.forEach((key, value) {
       ret.add(value);
     });
     for (var user in users) {
-      if (checked_users[user.id] == null) {
+      if (checkedUsers[user.id] == null) {
         ret.add(user);
       }
     }
@@ -102,6 +105,7 @@ class AddGroupController extends GetxController with StateMixin<List<User>> {
   @override
   void onClose() {
     searchController.dispose();
+    groupNameController.dispose();
     super.onClose();
   }
 
